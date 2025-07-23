@@ -3,6 +3,7 @@
     <div class="page-actions">
         <button id="import-customers-btn" class="btn btn-secondary"><i class="fa-solid fa-file-import"></i> استيراد من Excel</button>
         <button id="export-customers-btn" class="btn btn-secondary"><i class="fa-solid fa-file-excel"></i> تصدير إلى Excel</button>
+        <button id="download-customers-template-btn" class="btn btn-secondary"><i class="fa-solid fa-download"></i> تحميل قالب Excel</button>
     </div>
     <div class="form-container">
         <h2>إضافة عميل جديد</h2>
@@ -26,7 +27,10 @@
                     <th>العنوان الافتراضي</th>
                     <th>إجمالي الإنفاق</th>
                     <th>عدد الطلبات</th>
-                    <th>النقاط المكتسبة الكلية</th> <th>النقاط المتبقية للاستخدام</th> <th>النقاط التي تم استخدامها سابقاً</th> <th>إجراءات</th>
+                    <th>النقاط المكتسبة الكلية</th>
+                    <th>النقاط المتبقية للاستخدام</th>
+                    <th>النقاط التي تم استخدامها سابقاً</th>
+                    <th>إجراءات</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -47,11 +51,12 @@
                     <th>طريقة الدفع</th>
                     <th>الخصم اليدوي</th>
                     <th>الإجمالي</th>
-                    <th>نقاط الولاء المكتسبة</th> <th>المنتجات</th>
+                    <th>نقاط الولاء المكتسبة</th>
+                    <th>المنتجات</th>
                 </tr>
             </thead>
             <tbody id="transactions-table-body">
-                </tbody>
+            </tbody>
         </table>
     </div>
 

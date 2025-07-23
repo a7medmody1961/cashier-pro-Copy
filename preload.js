@@ -1,9 +1,13 @@
 /*
   File: preload.js
-  Version: 3.1
+  Version: 3.5 (Updated)
   Description: Securely exposes backend functionality (IPC channels) to the frontend.
   - (Task 13) Added 'sales:get-details' for re-printing invoices.
   - (Task 14) Updated 'processRefund' to accept an object with saleId and userId.
+  - (Feature) Added IPC handlers for product and customer import/export from Excel.
+  - (FIX) Corrected onCustomersUpdate to be an ipcRenderer.on listener.
+  - (Feature) Added IPC handlers for downloading Excel templates.
+  - (FIX) Ensured correct exposure of template download functions.
 */
 
 const { contextBridge, ipcRenderer } = require('electron');
@@ -36,8 +40,11 @@ contextBridge.exposeInMainWorld('api', {
   selectImage: () => ipcRenderer.invoke('products:select-image'),
   getImagesPath: () => ipcRenderer.invoke('products:get-images-path'),
   onProductsUpdate: (callback) => ipcRenderer.on('products-updated', () => callback()),
-  exportProducts: () => ipcRenderer.invoke('products:export-excel'),
-  importProducts: () => ipcRenderer.invoke('products:import-excel'),
+  // Expose product import/export functions
+  exportProductsToExcel: () => ipcRenderer.invoke('products:export-excel'),
+  importProductsFromExcel: () => ipcRenderer.invoke('products:import-excel'),
+  // New: Expose product template download function
+  downloadProductsTemplate: () => ipcRenderer.invoke('products:download-template'),
 
   // --- Users ---
   getUsers: () => ipcRenderer.invoke('users:get'),
@@ -53,8 +60,8 @@ contextBridge.exposeInMainWorld('api', {
   // (Task 13) New handler to get full details for a single sale
   getSaleDetails: (saleId) => ipcRenderer.invoke('sales:get-details', saleId),
    // جديد: إضافة الدالة onSalesUpdate للسماح لـ reports.js بالاستماع لتحديثات المبيعات
-  onSalesUpdate: (callback) => ipcRenderer.on('sales-updated', (event) => callback()), // <<< أضف هذا السطر
-  
+  onSalesUpdate: (callback) => ipcRenderer.on('sales-updated', (event) => callback()),
+
 
   // --- Reports ---
   getAnalytics: (dateRange) => ipcRenderer.invoke('reports:get-analytics'),
@@ -69,10 +76,13 @@ contextBridge.exposeInMainWorld('api', {
   addCustomerAddress: (data) => ipcRenderer.invoke('customers:add-address', data),
   updateCustomerAddress: (addressData) => ipcRenderer.invoke('customers:update-address', addressData),
   deleteCustomerAddress: (addressId) => ipcRenderer.invoke('customers:delete-address', addressId),
-  exportCustomers: () => ipcRenderer.invoke('customers:export-excel'),
-  importCustomers: (data) => ipcRenderer.invoke('customers:import-excel', data),
-  // إضافة جديدة: جلب معاملات العميل
-  getCustomerTransactions: (customerId) => ipcRenderer.invoke('customers:get-transactions', customerId),
+  // Expose customer import/export functions
+  exportCustomersToExcel: () => ipcRenderer.invoke('customers:export-excel'),
+  importCustomersFromExcel: () => ipcRenderer.invoke('customers:import-excel'),
+  // New: Expose customer template download function
+  downloadCustomersTemplate: () => ipcRenderer.invoke('customers:download-template'),
+  // FIX: Corrected onCustomersUpdate to be an ipcRenderer.on listener
+  onCustomersUpdate: (callback) => ipcRenderer.on('customers-updated', () => callback()),
 
   // --- Expenses ---
   getExpenses: (dateRange) => ipcRenderer.invoke('expenses:get', dateRange),

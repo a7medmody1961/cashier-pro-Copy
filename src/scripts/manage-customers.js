@@ -1,10 +1,4 @@
-/*
-  File: src/scripts/manage-customers.js
-  Version: 2.3
-  Changes:
-  - (FIX) Translated all Swal (SweetAlert2) messages to be fully in Arabic.
-  - (Feature) Updated renderTable to display loyalty points details.
-*/
+//File: src/scripts/manage-customers.js
 export function init() {
     const addCustomerForm = document.getElementById('add-customer-form');
     if (!addCustomerForm) return;
@@ -27,14 +21,19 @@ export function init() {
     const transactionsTableBody = document.getElementById('transactions-table-body');
     const closeTransactionsBtn = document.getElementById('close-transactions-btn');
 
+    // أزرار الاستيراد والتصدير للعملاء
+    const importCustomersBtn = document.getElementById('import-customers-btn');
+    const exportCustomersBtn = document.getElementById('export-customers-btn');
+    const downloadCustomersTemplateBtn = document.getElementById('download-customers-template-btn'); // تم الحصول على الزر هنا
+
 
     async function loadCustomers() {
         try {
             const customers = await window.api.getCustomers();
             renderTable(customers);
-        } catch (error) { 
-            console.error('Failed to load customers:', error); 
-            Swal.fire('خطأ', 'فشل تحميل قائمة العملاء.', 'error'); 
+        } catch (error) {
+            console.error('Failed to load customers:', error);
+            Swal.fire('خطأ', 'فشل تحميل قائمة العملاء.', 'error');
         }
     }
 
@@ -70,7 +69,7 @@ export function init() {
             Swal.fire('خطأ', error.message || 'فشلت إضافة العميل. قد يكون رقم الهاتف مسجل من قبل.', 'error');
         }
     });
-    
+
     function openAddressModal(customerId, customerName) {
         modalCustomerName.textContent = `عناوين العميل: ${customerName}`;
         modalCustomerIdInput.value = customerId;
@@ -204,7 +203,7 @@ export function init() {
         customerTransactionsSection.style.display = 'none';
         transactionsTableBody.innerHTML = ''; // مسح البيانات عند الإغلاق
     });
-    
+
     customersTableBody.addEventListener('click', async (e) => {
         const target = e.target.closest('button');
         if (!target) return;
@@ -214,26 +213,63 @@ export function init() {
         } else if (target.classList.contains('view-transactions-btn')) { // معالج جديد لزر "عرض المعاملات"
             showCustomerTransactions(id, target.dataset.name);
         } else if (target.classList.contains('delete-btn')) {
-            const result = await Swal.fire({ 
-                title: 'هل أنت متأكد؟', 
-                text: "سيتم حذف العميل وكل بياناته المرتبطة به!", 
-                icon: 'warning', 
-                showCancelButton: true, 
-                confirmButtonColor: '#d33', 
-                cancelButtonText: 'إلغاء', 
-                confirmButtonText: 'نعم، قم بالحذف!' 
+            const result = await Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: "سيتم حذف العميل وكل بياناته المرتبطة به!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonText: 'إلغاء',
+                confirmButtonText: 'نعم، قم بالحذف!'
             });
             if (result.isConfirmed) {
                 try {
                     await window.api.deleteCustomer(id);
                     Swal.fire('تم الحذف!', 'تم حذف العميل بنجاح.', 'success');
                     loadCustomers();
-                } catch (error) { 
-                    Swal.fire('خطأ', 'فشل حذف العميل.', 'error'); 
+                } catch (error) {
+                    Swal.fire('خطأ', 'فشل حذف العميل.', 'error');
                 }
             }
         }
     });
 
     loadCustomers();
+    window.api.onCustomersUpdate(loadCustomers); // Listen for updates from main process
+
+    // --- New Event Listeners for Import/Export Buttons (Customers) ---
+    importCustomersBtn.addEventListener('click', async () => {
+        const result = await window.api.importCustomersFromExcel();
+        if (result.success) {
+            Swal.fire('تم الاستيراد!', `تم استيراد ${result.count} عميل بنجاح.`, 'success');
+            loadCustomers(); // Reload customers after import
+        } else {
+            Swal.fire('خطأ في الاستيراد', result.message || 'فشل استيراد العملاء من Excel.', 'error');
+        }
+    });
+
+    exportCustomersBtn.addEventListener('click', async () => {
+        const result = await window.api.exportCustomersToExcel();
+        if (result.success) {
+            Swal.fire('تم التصدير!', `تم تصدير العملاء إلى: ${result.path}`, 'success');
+        } else {
+            Swal.fire('خطأ في التصدير', result.message || 'فشل تصدير العملاء إلى Excel.', 'error');
+        }
+    });
+
+    // --- New Event Listener for Download Customers Template Button ---
+    // تأكد من أن هذا المستمع يتم إرفاقه بعد التأكد من وجود العنصر
+    if (downloadCustomersTemplateBtn) {
+        downloadCustomersTemplateBtn.addEventListener('click', async () => {
+            console.log('Attempting to download customers template...'); // Log for debugging
+            const result = await window.api.downloadCustomersTemplate();
+            if (result.success) {
+                Swal.fire('تم التحميل!', `تم تحميل قالب العملاء إلى: ${result.path}`, 'success');
+            } else {
+                Swal.fire('خطأ في التحميل', result.message || 'فشل تحميل قالب العملاء.', 'error');
+            }
+        });
+    } else {
+        console.error('Download Customers Template Button not found!');
+    }
 }

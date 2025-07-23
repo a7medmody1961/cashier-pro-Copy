@@ -1,6 +1,4 @@
-// ==================================================================================
-// الملف السادس: src/scripts/manage-products.js (النسخة الكاملة والنهائية)
-// ==================================================================================
+//File: src/scripts/manage-products.js
 export function init() {
     console.log("Product management script initialized.");
     const productForm = document.getElementById('product-form');
@@ -27,6 +25,11 @@ export function init() {
     const productIconInput = document.getElementById('product-icon');
     const iconPreview = document.getElementById('icon-preview');
     const iconSuggestionsDiv = document.getElementById('icon-suggestions'); // جديد
+
+    // أزرار الاستيراد والتصدير للمنتجات
+    const importProductsBtn = document.getElementById('import-products-btn');
+    const exportProductsBtn = document.getElementById('export-products-btn');
+    const downloadProductsTemplateBtn = document.getElementById('download-products-template-btn'); // تم الحصول على الزر هنا
 
     let productsCache = [];
     let selectedImagePath = null;
@@ -186,148 +189,6 @@ export function init() {
         { name: "شاشة", iconClass: "fa-display" },
         { name: "لوحة مفاتيح", iconClass: "fa-keyboard" },
         { name: "ماوس", iconClass: "fa-mouse" },
-        { name: "طابعة", iconClass: "fa-print" },
-        { name: "ماسح ضوئي", iconClass: "fa-scanner" },
-        { name: "فاكس", iconClass: "fa-fax" },
-        { name: "شبكة", iconClass: "fa-network-wired" },
-        { name: "واي فاي", iconClass: "fa-wifi" },
-        { name: "بلوتوث", iconClass: "fa-bluetooth" },
-        { name: "USB", iconClass: "fa-usb" },
-        { name: "بطارية", iconClass: "fa-battery-full" },
-        { name: "شحن", iconClass: "fa-charging-station" },
-        { name: "كهرباء", iconClass: "fa-plug" },
-        { name: "ضوء", iconClass: "fa-lightbulb" },
-        { name: "مروحة", iconClass: "fa-fan" },
-        { name: "تكييف", iconClass: "fa-wind" },
-        { name: "تدفئة", iconClass: "fa-fire-burner" },
-        { name: "مياه", iconClass: "fa-faucet-drip" },
-        { name: "صرف صحي", iconClass: "fa-toilet" },
-        { name: "قمامة", iconClass: "fa-trash" },
-        { name: "إعادة تدوير", iconClass: "fa-recycle" },
-        { name: "أمان", iconClass: "fa-shield-halved" },
-        { name: "كشف", iconClass: "fa-magnifying-glass-chart" },
-        { name: "تشفير", iconClass: "fa-lock" },
-        { name: "فك تشفير", iconClass: "fa-unlock" },
-        { name: "فيروس", iconClass: "fa-virus" },
-        { name: "جدار ناري", iconClass: "fa-firewall" },
-        { name: "مراقبة", iconClass: "fa-video" },
-        { name: "إنذار", iconClass: "fa-bell" },
-        { name: "حماية", iconClass: "fa-shield-halved" },
-        { name: "نسخ احتياطي", iconClass: "fa-database" },
-        { name: "استعادة", iconClass: "fa-rotate-left" },
-        { name: "سحابة", iconClass: "fa-cloud" },
-        { name: "خادم", iconClass: "fa-server" },
-        { name: "قاعدة بيانات", iconClass: "fa-database" },
-        { name: "شبكة", iconClass: "fa-network-wired" },
-        { name: "راوتر", iconClass: "fa-router" },
-        { name: "سويتش", iconClass: "fa-ethernet" },
-        { name: "كابل", iconClass: "fa-cable-car" },
-        { name: "هوائي", iconClass: "fa-tower-broadcast" },
-        { name: "ساتلايت", iconClass: "fa-satellite" },
-        { name: "راديو", iconClass: "fa-radio" },
-        { name: "موجة", iconClass: "fa-wave-square" },
-        { name: "صوت", iconClass: "fa-volume-high" },
-        { name: "صامت", iconClass: "fa-volume-xmark" },
-        { name: "ميكروفون", iconClass: "fa-microphone" },
-        { name: "سماعات", iconClass: "fa-headphones" },
-        { name: "فيديو", iconClass: "fa-video" },
-        { name: "كاميرا", iconClass: "fa-camera" },
-        { name: "صورة", iconClass: "fa-image" },
-        { name: "معرض", iconClass: "fa-images" },
-        { name: "ألبوم", iconClass: "fa-photo-film" },
-        { name: "موسيقى", iconClass: "fa-music" },
-        { name: "تشغيل", iconClass: "fa-play" },
-        { name: "إيقاف", iconClass: "fa-stop" },
-        { name: "إيقاف مؤقت", iconClass: "fa-pause" },
-        { name: "تخطي", iconClass: "fa-forward" },
-        { name: "رجوع", iconClass: "fa-backward" },
-        { name: "حلقة", iconClass: "fa-repeat" },
-        { name: "عشوائي", iconClass: "fa-shuffle" },
-        { name: "قائمة تشغيل", iconClass: "fa-list-music" },
-        { name: "صوت عال", iconClass: "fa-volume-up" },
-        { name: "صوت منخفض", iconClass: "fa-volume-down" },
-        { name: "كتم الصوت", iconClass: "fa-volume-mute" },
-        { name: "ملء الشاشة", iconClass: "fa-expand" },
-        { name: "تصغير الشاشة", iconClass: "fa-compress" },
-        { name: "شاشة", iconClass: "fa-desktop" },
-        { name: "جوال", iconClass: "fa-mobile-screen" },
-        { name: "تابلت", iconClass: "fa-tablet-screen-button" },
-        { name: "لابتوب", iconClass: "fa-laptop" },
-        { name: "ساعة ذكية", iconClass: "fa-watch" },
-        { name: "كاميرا ويب", iconClass: "fa-camera-web" },
-        { name: "ميكروفون لابتوب", iconClass: "fa-microphone-lines" },
-        { name: "سماعة رأس", iconClass: "fa-headset" },
-        { name: "طابعة", iconClass: "fa-print" },
-        { name: "ماسح ضوئي", iconClass: "fa-scanner" },
-        { name: "فاكس", iconClass: "fa-fax" },
-        { name: "شبكة", iconClass: "fa-network-wired" },
-        { name: "واي فاي", iconClass: "fa-wifi" },
-        { name: "بلوتوث", iconClass: "fa-bluetooth" },
-        { name: "USB", iconClass: "fa-usb" },
-        { name: "بطارية", iconClass: "fa-battery-full" },
-        { name: "شحن", iconClass: "fa-charging-station" },
-        { name: "كهرباء", iconClass: "fa-plug" },
-        { name: "ضوء", iconClass: "fa-lightbulb" },
-        { name: "مروحة", iconClass: "fa-fan" },
-        { name: "تكييف", iconClass: "fa-wind" },
-        { name: "تدفئة", iconClass: "fa-fire-burner" },
-        { name: "مياه", iconClass: "fa-faucet-drip" },
-        { name: "صرف صحي", iconClass: "fa-toilet" },
-        { name: "قمامة", iconClass: "fa-trash" },
-        { name: "إعادة تدوير", iconClass: "fa-recycle" },
-        { name: "أمان", iconClass: "fa-shield-halved" },
-        { name: "كشف", iconClass: "fa-magnifying-glass-chart" },
-        { name: "تشفير", iconClass: "fa-lock" },
-        { name: "فك تشفير", iconClass: "fa-unlock" },
-        { name: "فيروس", iconClass: "fa-virus" },
-        { name: "جدار ناري", iconClass: "fa-firewall" },
-        { name: "مراقبة", iconClass: "fa-video" },
-        { name: "إنذار", iconClass: "fa-bell" },
-        { name: "حماية", iconClass: "fa-shield-halved" },
-        { name: "نسخ احتياطي", iconClass: "fa-database" },
-        { name: "استعادة", iconClass: "fa-rotate-left" },
-        { name: "سحابة", iconClass: "fa-cloud" },
-        { name: "خادم", iconClass: "fa-server" },
-        { name: "قاعدة بيانات", iconClass: "fa-database" },
-        { name: "شبكة", iconClass: "fa-network-wired" },
-        { name: "راوتر", iconClass: "fa-router" },
-        { name: "سويتش", iconClass: "fa-ethernet" },
-        { name: "كابل", iconClass: "fa-cable-car" },
-        { name: "هوائي", iconClass: "fa-tower-broadcast" },
-        { name: "ساتلايت", iconClass: "fa-satellite" },
-        { name: "راديو", iconClass: "fa-radio" },
-        { name: "موجة", iconClass: "fa-wave-square" },
-        { name: "صوت", iconClass: "fa-volume-high" },
-        { name: "صامت", iconClass: "fa-volume-xmark" },
-        { name: "ميكروفون", iconClass: "fa-microphone" },
-        { name: "سماعات", iconClass: "fa-headphones" },
-        { name: "فيديو", iconClass: "fa-video" },
-        { name: "كاميرا", iconClass: "fa-camera" },
-        { name: "صورة", iconClass: "fa-image" },
-        { name: "معرض", iconClass: "fa-images" },
-        { name: "ألبوم", iconClass: "fa-photo-film" },
-        { name: "موسيقى", iconClass: "fa-music" },
-        { name: "تشغيل", iconClass: "fa-play" },
-        { name: "إيقاف", iconClass: "fa-stop" },
-        { name: "إيقاف مؤقت", iconClass: "fa-pause" },
-        { name: "تخطي", iconClass: "fa-forward" },
-        { name: "رجوع", iconClass: "fa-backward" },
-        { name: "حلقة", iconClass: "fa-repeat" },
-        { name: "عشوائي", iconClass: "fa-shuffle" },
-        { name: "قائمة تشغيل", iconClass: "fa-list-music" },
-        { name: "صوت عال", iconClass: "fa-volume-up" },
-        { name: "صوت منخفض", iconClass: "fa-volume-down" },
-        { name: "كتم الصوت", iconClass: "fa-volume-mute" },
-        { name: "ملء الشاشة", iconClass: "fa-expand" },
-        { name: "تصغير الشاشة", iconClass: "fa-compress" },
-        { name: "شاشة", iconClass: "fa-desktop" },
-        { name: "جوال", iconClass: "fa-mobile-screen" },
-        { name: "تابلت", iconClass: "fa-tablet-screen-button" },
-        { name: "لابتوب", iconClass: "fa-laptop" },
-        { name: "ساعة ذكية", iconClass: "fa-watch" },
-        { name: "كاميرا ويب", iconClass: "fa-camera-web" },
-        { name: "ميكروفون لابتوب", iconClass: "fa-microphone-lines" },
-        { name: "سماعة رأس", iconClass: "fa-headset" },
         { name: "طابعة", iconClass: "fa-print" },
         { name: "ماسح ضوئي", iconClass: "fa-scanner" },
         { name: "فاكس", iconClass: "fa-fax" },
@@ -680,4 +541,40 @@ function formatCurrency(amount) {
     clearFormBtn.addEventListener('click', clearForm);
     loadProducts();
     window.api.onProductsUpdate(loadProducts);
+
+    // --- New Event Listeners for Import/Export Buttons (Products) ---
+    importProductsBtn.addEventListener('click', async () => {
+        const result = await window.api.importProductsFromExcel();
+        if (result.success) {
+            Swal.fire('تم الاستيراد!', `تم استيراد ${result.count} منتج بنجاح.`, 'success');
+            loadProducts(); // Reload products after import
+        } else {
+            Swal.fire('خطأ في الاستيراد', result.message || 'فشل استيراد المنتجات من Excel.', 'error');
+        }
+    });
+
+    exportProductsBtn.addEventListener('click', async () => {
+        const result = await window.api.exportProductsToExcel();
+        if (result.success) {
+            Swal.fire('تم التصدير!', `تم تصدير المنتجات إلى: ${result.path}`, 'success');
+        } else {
+            Swal.fire('خطأ في التصدير', result.message || 'فشل تصدير المنتجات إلى Excel.', 'error');
+        }
+    });
+
+    // --- New Event Listener for Download Products Template Button ---
+    // تأكد من أن هذا المستمع يتم إرفاقه بعد التأكد من وجود العنصر
+    if (downloadProductsTemplateBtn) {
+        downloadProductsTemplateBtn.addEventListener('click', async () => {
+            console.log('Attempting to download products template...'); // Log for debugging
+            const result = await window.api.downloadProductsTemplate();
+            if (result.success) {
+                Swal.fire('تم التحميل!', `تم تحميل قالب المنتجات إلى: ${result.path}`, 'success');
+            } else {
+                Swal.fire('خطأ في التحميل', result.message || 'فشل تحميل قالب المنتجات.', 'error');
+            }
+        });
+    } else {
+        console.error('Download Products Template Button not found!');
+    }
 }
