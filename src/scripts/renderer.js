@@ -1,5 +1,4 @@
-// src/scripts/renderer.js
-import AppState from './core/app-state.js'; // أضف هذا السطر
+import AppState from './core/app-state.js';
 import { initClock } from './ui/clock.js';
 import { initTheme } from './ui/theme.js';
 import { initPageLoader } from './core/page-loader.js';
@@ -23,11 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // تعيين المستخدم الحالي في AppState
-            AppState.setCurrentUser(currentUser); // أضف هذا السطر
+            AppState.setCurrentUser(currentUser);
 
-            buildSidebarNav(JSON.parse(currentUser.permissions)); // <-- Parse permissions
+            // تمرير صلاحيات المستخدم لبناء الشريط الجانبي
+            // تأكد من أن صلاحية 'manage-salespersons' مضافة للمدير في database.js
+            buildSidebarNav(JSON.parse(currentUser.permissions));
             const pageLoader = initPageLoader(appSettings, currentUser);
-            initSidebar(appSettings, currentUser); // AppState سيتم الوصول إليها داخل Sidebar الآن
+            initSidebar(appSettings, currentUser);
 
             await pageLoader.navigateTo('pos');
             console.log("Application initialization complete.");
@@ -42,12 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'manage-expenses', icon: 'fa-file-invoice-dollar', label: 'المصروفات' },
             { id: 'reports', icon: 'fa-chart-line', label: 'التقارير' },
             { id: 'manage-users', icon: 'fa-user-gear', label: 'المستخدمين' },
+            // إضافة صفحة إدارة البائعين
+            { id: 'manage-salespersons', icon: 'fa-user-tag', label: 'البائعين' }, // استخدم fa-user-tag أو fa-handshake أو fa-users
             { id: 'settings', icon: 'fa-gear', label: 'الإعدادات' },
         ];
 
         if (!navContainer) return;
         navContainer.innerHTML = '';
         availablePages.forEach(page => {
+            // تحقق من صلاحية المستخدم للصفحة
             if (permissions && permissions[page.id]) {
                 const button = document.createElement('button');
                 button.className = 'nav-btn';
@@ -71,10 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 let clickSynth; // لتشغيل الأصوات القصيرة مثل إضافة منتج
 
-/**
- * Initializes the Tone.js audio context and synths.
- * Call this function once when the application starts.
- */
+
 async function initializeAudio() {
     // قم بإزالة التحقق `if (!window.Tone)`
     try {
@@ -130,6 +131,3 @@ window.api.onTriggerSound((soundName) => {
 
 // Call initializeAudio when the DOM is ready
 document.addEventListener('DOMContentLoaded', initializeAudio);
-
-// تأكد من إضافة هذا السطر في preload.js لتمرير الحدث
-// onTriggerSound: (callback) => ipcRenderer.on('trigger-sound', (event, soundName) => callback(soundName)),

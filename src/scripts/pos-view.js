@@ -1,18 +1,12 @@
-// ==================================================================================
-// الملف: pos-view.js
-// المسار: src/scripts/pos-view.js
-// الشرح: تم تعديل ميزة الملاحظات على الأصناف في الفاتورة لتدعم إضافة الأصناف كمفردة في حال وجود ملاحظات مختلفة.
-// ==================================================================================
-
 import { generateInvoiceHTML } from './invoice-template.js';
 
 let allProducts = [], invoiceItems = [], currentOrderType = 'dine-in', currentCustomerData = {}, appSettings = {};
 let productGrid, searchBar, invoiceItemsDiv, subTotalSpan, vatTotalSpan, serviceTotalSpan, deliveryRow, deliveryTotalSpan, grandTotalSpan, finalizeButton, cancelOrderBtn, orderTypeSelector, dineInCustomerForm, deliveryCustomerForm, dineInCustomerNameInput, dineInCustomerPhoneInput, customerPhoneInput, customerNameInput, customerSearchResultsDiv, addressSelectionContainer;
-// عناصر نقاط الولاء الجديدة
 let loyaltyPointsSection, customerLoyaltyPointsSpan, applyLoyaltyDiscountCheckbox, loyaltyDiscountDisplay, loyaltyDiscountValueSpan;
-let loyaltyDiscountApplied = false; // حالة لتتبع ما إذا تم تطبيق خصم الولاء
+let loyaltyDiscountApplied = false; 
+// إضافة متغير جديد لعنصر اختيار البائع
+let salespersonSelect; 
 
-// عناصر الملاحظات الجديدة
 let noteModal, noteInput, saveNoteBtn, currentNoteProductId = null, currentNoteItemIndex = -1; // إضافة currentNoteItemIndex لتحديد العنصر بالضبط
 
 export function init(settings) {
@@ -20,6 +14,7 @@ export function init(settings) {
     getDomElements();
     setupEventListeners();
     loadProducts();
+    loadSalespersonsIntoDropdown(); // تحميل البائعين عند تهيئة الصفحة
     setOrderType('dine-in');
     window.api.onProductsUpdate(loadProducts);
 }
@@ -46,17 +41,18 @@ function getDomElements() {
     customerSearchResultsDiv = document.getElementById('customer-search-results');
     addressSelectionContainer = document.getElementById('address-selection-container');
 
-    // جلب عناصر نقاط الولاء
     loyaltyPointsSection = document.getElementById('loyalty-points-section');
     customerLoyaltyPointsSpan = document.getElementById('customer-loyalty-points');
     applyLoyaltyDiscountCheckbox = document.getElementById('apply-loyalty-discount');
     loyaltyDiscountDisplay = document.getElementById('loyalty-discount-display');
     loyaltyDiscountValueSpan = document.getElementById('loyalty-discount-value');
 
-    // جلب عناصر الملاحظات
     noteModal = document.getElementById('note-modal');
     noteInput = document.getElementById('note-input');
     saveNoteBtn = document.getElementById('save-note-btn');
+
+    // جلب عنصر اختيار البائع
+    salespersonSelect = document.getElementById('salesperson-select');
 }
 
 async function loadProducts() {
@@ -69,6 +65,33 @@ async function loadProducts() {
         Swal.fire('خطأ', 'فشل تحميل قائمة المنتجات.', 'error');
     }
 }
+
+/**
+ * تحميل البائعين من قاعدة البيانات وملء القائمة المنسدلة.
+ */
+async function loadSalespersonsIntoDropdown() {
+    try {
+        const response = await window.api.getAllSalespersons();
+        if (response.success && salespersonSelect) {
+            // مسح الخيارات الحالية باستثناء الخيار الافتراضي
+            salespersonSelect.innerHTML = '<option value="">-- لا يوجد بائع --</option>';
+            response.data.forEach(salesperson => {
+                // فقط إضافة البائعين النشطين
+                if (salesperson.is_active) {
+                    const option = document.createElement('option');
+                    option.value = salesperson.id;
+                    option.textContent = salesperson.name;
+                    salespersonSelect.appendChild(option);
+                }
+            });
+        } else if (!response.success) {
+            console.error("Failed to load salespersons for dropdown:", response.message);
+        }
+    } catch (error) {
+        console.error("Error loading salespersons into dropdown:", error);
+    }
+}
+
 
 function renderProducts(productsToRender) {
     if (!productGrid) {
@@ -117,20 +140,15 @@ function addProductToInvoice(productId) {
 
     window.api.playSound('add-to-cart');
 
-    // البحث عن صنف موجود بنفس الـ ID ونفس الملاحظة (أو كلاهما بدون ملاحظة)
-    const existingItem = invoiceItems.find(item => item.id === productId && item.note === ''); // فقط إذا لم تكن هناك ملاحظة
-    const existingItemWithNote = invoiceItems.find(item => item.id === productId && item.note !== ''); // للتحقق من وجود ملاحظة بالفعل
+    const existingItem = invoiceItems.find(item => item.id === productId && item.note === '');
+    const existingItemWithNote = invoiceItems.find(item => item.id === productId && item.note !== '');
 
     if (existingItem) {
-        // إذا وجد صنف بنفس الـ ID وبدون ملاحظة، قم بزيادة الكمية
         existingItem.quantity += quantityToAdd;
     } else if (product.note && existingItemWithNote && existingItemWithNote.note === product.note) {
-        // إذا كان المنتج الذي يتم إضافته له ملاحظة، ووجد صنف بنفس الـ ID ونفس الملاحظة، قم بزيادة الكمية
         existingItemWithNote.quantity += quantityToAdd;
     }
     else {
-        // إذا لم يتم العثور على صنف مطابق (بنفس الـ ID والملاحظة)، أضف صنفًا جديدًا.
-        // عند إضافة منتج جديد، الملاحظة تكون فارغة افتراضياً.
         invoiceItems.push({ ...product, quantity: quantityToAdd, note: '' });
     }
     updateInvoice();
@@ -164,7 +182,6 @@ function updateInvoice() {
     serviceTotalSpan.textContent = formatCurrency(amounts.service);
     deliveryTotalSpan.textContent = formatCurrency(amounts.delivery);
 
-    // تحديث وعرض خصم نقاط الولاء
     const loyaltyDiscount = calculateLoyaltyDiscount(amounts.total);
     if (loyaltyDiscountApplied && loyaltyDiscount > 0) {
         loyaltyDiscountDisplay.style.display = 'block';
@@ -203,10 +220,8 @@ function calculateLoyaltyDiscount(currentTotal) {
 
     applyLoyaltyDiscountCheckbox.disabled = false;
 
-    // حساب أقصى خصم ممكن بناءً على النقاط المتاحة
     const maxDiscountFromPoints = currentCustomerData.loyalty_points * pointsRedeemValue;
 
-    // الخصم لا يجب أن يتجاوز قيمة الفاتورة
     return Math.min(maxDiscountFromPoints, currentTotal);
 }
 
@@ -218,7 +233,6 @@ async function finalizeSale() {
     const { value: paymentMethod } = await Swal.fire({ title: 'اختر طريقة الدفع', input: 'radio', inputOptions: { 'Cash': 'نقدي', 'Card': 'بطاقة' }, inputValidator: (value) => !value && 'يجب اختيار طريقة الدفع!', confirmButtonText: 'متابعة', cancelButtonText: 'إلغاء', showCancelButton: true });
     if (!paymentMethod) return;
 
-    // تحديد بيانات العميل بناءً على نوع الطلب
     let customerDataForSale = { id: null, name: null, phone: null, address: null };
 
     if (currentOrderType === 'delivery') {
@@ -247,7 +261,7 @@ async function finalizeSale() {
         }
     }
 
-    const amounts = calculateTotals(); // إعادة حساب الإجماليات قبل إتمام البيع
+    const amounts = calculateTotals();
     let totalAmountAfterDiscount = amounts.total;
     let pointsUsed = 0;
     let loyaltyDiscountAmount = 0;
@@ -256,23 +270,26 @@ async function finalizeSale() {
         loyaltyDiscountAmount = calculateLoyaltyDiscount(amounts.total);
         totalAmountAfterDiscount = amounts.total - loyaltyDiscountAmount;
 
-        // حساب عدد النقاط التي تم استخدامها بناءً على الخصم
         const pointsRedeemValue = parseFloat(appSettings.pointsRedeemValue) || 0;
         if (pointsRedeemValue > 0) {
             pointsUsed = Math.round(loyaltyDiscountAmount / pointsRedeemValue);
         }
     }
 
+    // الحصول على معرف البائع المختار
+    const selectedSalespersonId = salespersonSelect.value ? parseInt(salespersonSelect.value) : null;
+
     const saleData = {
         type: currentOrderType,
-        items: invoiceItems, // invoiceItems تحتوي الآن على حقل 'note'
+        items: invoiceItems,
         amounts: { ...amounts, total: totalAmountAfterDiscount, loyaltyDiscount: loyaltyDiscountAmount }, // إرسال الإجمالي بعد الخصم وقيمة الخصم
         paymentMethod,
         userId: currentUser.id,
         shiftId: activeShift.id,
+        salespersonId: selectedSalespersonId, // إضافة معرف البائع إلى بيانات البيع
         customer: customerDataForSale,
         transactionRef: null,
-        pointsUsed: pointsUsed // إرسال عدد النقاط المستخدمة
+        pointsUsed: pointsUsed
     };
 
     try {
@@ -280,7 +297,6 @@ async function finalizeSale() {
         if (result.success) {
             window.api.playSound('sale-complete');
             Swal.fire('تم!', 'اكتملت عملية البيع بنجاح.', 'success');
-            // تمرير loyaltyDiscountAmount إلى generateInvoiceHTML
             const invoiceHtml = generateInvoiceHTML(result.saleDetails, result.saleItems, appSettings, loyaltyDiscountAmount);
             showPreviewModal(`فاتورة رقم ${result.saleId}`, invoiceHtml);
             clearInvoice();
@@ -304,13 +320,17 @@ function clearInvoice() {
     customerSearchResultsDiv.style.display = 'none';
     addressSelectionContainer.innerHTML = '<label for="customer-address">العنوان</label><input type="text" id="customer-address" required>';
 
-    // إعادة تعيين حالة نقاط الولاء
     loyaltyPointsSection.style.display = 'none';
     customerLoyaltyPointsSpan.textContent = '0 نقطة';
     applyLoyaltyDiscountCheckbox.checked = false;
     applyLoyaltyDiscountCheckbox.disabled = true;
     loyaltyDiscountApplied = false;
     loyaltyDiscountDisplay.style.display = 'none';
+
+    // مسح اختيار البائع
+    if (salespersonSelect) {
+        salespersonSelect.value = ''; // إعادة تعيين إلى الخيار الافتراضي
+    }
 
     updateInvoice();
 }
@@ -323,7 +343,6 @@ function setOrderType(type) {
     clearInvoice();
 }
 
-// دالة مساعدة لتحديث الكمية من مربع الإدخال
 function updateItemQuantityFromInput(inputElement) {
     const itemIndex = parseInt(inputElement.dataset.itemIndex);
     const item = invoiceItems[itemIndex];
@@ -338,30 +357,27 @@ function updateItemQuantityFromInput(inputElement) {
     }
 }
 
-// دالة لفتح مودال الملاحظات
 function openNoteModal(itemIndex) {
     currentNoteItemIndex = itemIndex;
     const item = invoiceItems[itemIndex];
     if (item) {
-        noteInput.value = item.note || ''; // Load existing note
-        noteModal.style.display = 'flex'; // Show the modal
+        noteInput.value = item.note || '';
+        noteModal.style.display = 'flex';
     }
 }
 
-// دالة لإغلاق مودال الملاحظات
 function closeNoteModal() {
     noteModal.style.display = 'none';
     noteInput.value = '';
     currentNoteItemIndex = -1;
 }
 
-// دالة لحفظ الملاحظة
 function saveNote() {
     if (currentNoteItemIndex !== -1) {
         const item = invoiceItems[currentNoteItemIndex];
         if (item) {
             item.note = noteInput.value.trim();
-            updateInvoice(); // Update invoice to reflect the new note
+            updateInvoice(); 
         }
     }
     closeNoteModal();
@@ -391,14 +407,13 @@ function setupEventListeners() {
                 if (action === 'increase') item.quantity++;
                 if (action === 'decrease') item.quantity--;
                 if (item.quantity <= 0) {
-                    invoiceItems.splice(itemIndex, 1); // إزالة العنصر من المصفوفة
+                    invoiceItems.splice(itemIndex, 1); 
                 }
                 updateInvoice();
             }
             return;
         }
 
-        // معالج حدث لأيقونة الملاحظات
         if (target.closest('.note-icon-container')) {
             e.stopPropagation();
             const itemIndex = parseInt(target.closest('.note-icon-container').dataset.itemIndex);
@@ -406,13 +421,11 @@ function setupEventListeners() {
             return;
         }
 
-        // معالج حدث لزر إغلاق المودال
         if (target.classList.contains('close-button')) {
             closeNoteModal();
             return;
         }
 
-        // معالج حدث لزر حفظ الملاحظة
         if (target.id === 'save-note-btn') {
             saveNote();
             return;
@@ -445,40 +458,32 @@ function setupEventListeners() {
             updateItemQuantityFromInput(target);
             target.blur();
         }
-        // إغلاق المودال عند الضغط على Escape
         if (e.key === 'Escape' && noteModal.style.display === 'flex') {
             closeNoteModal();
         }
     });
 
-    // مستمع حدث لتغيير رقم هاتف العميل (للتوصيل والصالة)
     customerPhoneInput.addEventListener('input', handleCustomerPhoneInput);
     dineInCustomerPhoneInput.addEventListener('input', handleCustomerPhoneInput);
 
-    // مستمع حدث لمربع اختيار خصم نقاط الولاء
     applyLoyaltyDiscountCheckbox.addEventListener('change', () => {
         loyaltyDiscountApplied = applyLoyaltyDiscountCheckbox.checked;
-        updateInvoice(); // إعادة حساب الإجمالي لتطبيق/إزالة الخصم
+        updateInvoice();
     });
 }
 
-// دالة موحدة للتعامل مع إدخال رقم هاتف العميل
 async function handleCustomerPhoneInput(e) {
-    const phoneInput = e.target; // العنصر الذي قام بتشغيل الحدث (dineInCustomerPhoneInput أو customerPhoneInput)
+    const phoneInput = e.target;
     const phoneQuery = phoneInput.value.trim();
 
-    // عند مسح حقل الهاتف أو إذا كان أقل من 3 أحرف
     if (phoneQuery.length < 3) {
         customerSearchResultsDiv.style.display = 'none';
-        // مسح بيانات العميل الحالية ونقاط الولاء
         currentCustomerData = {};
-        // مسح حقول الاسم والهاتف الأخرى فقط
-        if (phoneInput.id === 'customer-phone') { // إذا كان حقل هاتف التوصيل
+        if (phoneInput.id === 'customer-phone') {
             customerNameInput.value = '';
-        } else { // إذا كان حقل هاتف الصالة
+        } else {
             dineInCustomerNameInput.value = '';
         }
-        // مسح حقول الهاتف الأخرى
         if (phoneInput.id === 'customer-phone') {
             dineInCustomerPhoneInput.value = '';
         } else {
@@ -497,12 +502,9 @@ async function handleCustomerPhoneInput(e) {
         const results = await window.api.searchCustomers(phoneQuery);
         if (results.length > 0) {
             renderCustomerSearchResults(results);
-            // لا يتم هنا selectCustomer تلقائياً، بل تظهر النتائج للمستخدم للاختيار
         } else {
             customerSearchResultsDiv.style.display = 'none';
-            // إذا لم يتم العثور على عميل، قم بمسح بيانات العميل ونقاط الولاء
             currentCustomerData = {};
-            // مسح حقول الاسم والهاتف الأخرى
             if (phoneInput.id === 'customer-phone') {
                 customerNameInput.value = '';
             } else {
@@ -542,7 +544,6 @@ function renderCustomerSearchResults(results) {
 async function selectCustomer(customer) {
     currentCustomerData = customer;
 
-    // تحديث حقول الاسم ورقم الهاتف لكلا القسمين لضمان التناسق
     customerNameInput.value = customer.name;
     customerPhoneInput.value = customer.phone;
     dineInCustomerNameInput.value = customer.name;
@@ -550,13 +551,12 @@ async function selectCustomer(customer) {
 
     customerSearchResultsDiv.style.display = 'none';
 
-    // عرض نقاط الولاء
     customerLoyaltyPointsSpan.textContent = `${customer.loyalty_points || 0} نقطة`;
     loyaltyPointsSection.style.display = 'block';
-    applyLoyaltyDiscountCheckbox.checked = false; // إعادة تعيين مربع الاختيار
-    loyaltyDiscountApplied = false; // إعادة تعيين حالة الخصم
-    loyaltyDiscountDisplay.style.display = 'none'; // إخفاء عرض الخصم
-    updateInvoice(); // لتحديث حالة زر الخصم والإجمالي
+    applyLoyaltyDiscountCheckbox.checked = false;
+    loyaltyDiscountApplied = false;
+    loyaltyDiscountDisplay.style.display = 'none';
+    updateInvoice();
 
     addressSelectionContainer.innerHTML = '<div class="loader-sm"></div>';
     try {

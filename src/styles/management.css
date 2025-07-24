@@ -1,14 +1,3 @@
-/*
-  File: src/styles/management.css
-  Version: 3.1
-  Description:
-  - (FIX) Added styles to make the active report filter button more prominent.
-*/
-
-/* ==========================================================================
-   1. General Management Page Layout
-   ========================================================================== */
-
 .management-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -27,11 +16,6 @@
     display: flex;
     gap: 10px;
 }
-
-
-/* ==========================================================================
-   2. Form Styles (Used across all management pages)
-   ========================================================================== */
 
 .form-container {
     background-color: var(--color-surface-solid);
@@ -63,7 +47,7 @@
     color: var(--color-text-muted);
 }
 
-.form-group input,
+.form-group input:not([type="checkbox"]), /* استبعاد checkbox من هذا التنسيق */
 .form-group select {
     padding: 12px;
     font-size: 1em;
@@ -73,6 +57,25 @@
     color: var(--color-text);
     width: 100%;
 }
+
+/* تحسين مظهر الـ checkbox في form-group */
+.form-group input[type="checkbox"] {
+    width: 20px; /* حجم قياسي لمربع الاختيار */
+    height: 20px;
+    accent-color: var(--color-primary); /* لون مربع الاختيار */
+    margin-top: 5px; /* مسافة صغيرة من الأعلى */
+    margin-left: 10px; /* مسافة بين المربع والنص في RTL */
+}
+
+/* لضمان محاذاة Label مع Checkbox في نفس السطر */
+.form-group.checkbox-group { /* يمكن إضافة هذا الكلاس لـ div.form-group الذي يحتوي على checkbox */
+    flex-direction: row;
+    align-items: center;
+}
+.form-group.checkbox-group label {
+    margin-bottom: 0; /* إزالة المسافة السفلية للـ label */
+}
+
 
 .form-image-section {
     display: flex;
@@ -93,12 +96,8 @@
     margin-top: 25px;
     display: flex;
     gap: 15px;
+    justify-content: flex-end; /* محاذاة الأزرار إلى اليمين */
 }
-
-
-/* ==========================================================================
-   3. User Permissions Styles (manage-users.html)
-   ========================================================================== */
 
 .permissions-container {
     margin-top: 20px;
@@ -141,11 +140,6 @@
     color: var(--color-text);
     margin: 0;
 }
-
-
-/* ==========================================================================
-   4. Table Styles (Used across all management pages)
-   ========================================================================== */
 
 .table-container {
     background-color: var(--color-surface-solid);
@@ -198,6 +192,24 @@ tbody tr:hover {
     border-radius: var(--border-radius-sm);
 }
 
+/* إضافة تنسيق لحالة النشط وغير النشط في جدول البائعين */
+.status-active {
+    background-color: rgba(5, 150, 105, 0.1);
+    color: #059669;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.status-inactive {
+    background-color: rgba(220, 38, 38, 0.1);
+    color: var(--color-danger);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+
 .status {
     padding: 5px 12px;
     border-radius: 20px;
@@ -209,10 +221,6 @@ tbody tr:hover {
 .status.completed { background-color: rgba(5, 150, 105, 0.1); color: #059669; }
 .status.refunded { background-color: rgba(220, 38, 38, 0.1); color: var(--color-danger); }
 
-
-/* ==========================================================================
-   5. Reports Page Specific Styles
-   ========================================================================== */
 .filters {
     display: flex;
     gap: 10px;
@@ -228,7 +236,6 @@ tbody tr:hover {
     box-shadow: none;
     border: none;
 }
-/* FIX: Make active filter button much more prominent */
 .filters .btn.active {
     background-color: var(--color-primary);
     color: white;
@@ -274,11 +281,6 @@ tbody tr:hover {
 }
 .chart-container h2 { margin-top: 0; }
 .chart-container canvas { max-height: 100%; }
-
-
-/* ==========================================================================
-   6. Modal Styles (For Customer Addresses)
-   ========================================================================== */
 
 .modal {
     display: none;
@@ -355,7 +357,7 @@ tbody tr:hover {
 #addresses-list li:last-child {
     border-bottom: none;
 }
-.product-icon-display { /* لجدول إدارة المنتجات */
+.product-icon-display {
     font-size: 2em;
     color: var(--color-primary);
     text-align: center;
@@ -373,7 +375,7 @@ tbody tr:hover {
 }
 
 .radio-group input[type="radio"] {
-    display: none; /* إخفاء زر الراديو الأصلي */
+    display: none;
 }
 
 .radio-group label {
@@ -397,7 +399,6 @@ tbody tr:hover {
     background-color: var(--color-primary-light);
     color: var(--color-primary);
 }
-/* Styles for Icon Suggestions Dropdown */
 .icon-suggestions-dropdown {
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-md);
@@ -405,11 +406,11 @@ tbody tr:hover {
     overflow-y: auto;
     background-color: var(--color-surface-solid);
     box-shadow: var(--shadow-md);
-    position: absolute; /* أو relative حسب التخطيط الأب */
-    width: calc(100% - 2px); /* لتغطية عرض حقل الإدخال */
+    position: absolute; 
+    width: calc(100% - 2px); 
     z-index: 10;
-    display: none; /* مخفي افتراضيا */
-    margin-top: 5px; /* مسافة صغيرة أسفل حقل الإدخال */
+    display: none; 
+    margin-top: 5px; 
 }
 
 .icon-suggestion-item {
@@ -433,7 +434,7 @@ tbody tr:hover {
 
 .icon-suggestion-item i {
     font-size: 1.2em;
-    width: 25px; /* لضمان محاذاة الأيقونات */
+    width: 25px; 
     text-align: center;
 }
 

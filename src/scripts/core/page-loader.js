@@ -1,10 +1,3 @@
-/*
-  File: src/scripts/core/page-loader.js
-  Version: 1.0 (New File)
-  Description: Handles dynamic loading of pages and their corresponding scripts.
-*/
-
-// A map to associate page names with their script modules.
 const pageScripts = {
     'pos': () => import('../pos-view.js'),
     'manage-products': () => import('../manage-products.js'),
@@ -13,6 +6,8 @@ const pageScripts = {
     'manage-expenses': () => import('../manage-expenses.js'),
     'reports': () => import('../reports.js'),
     'settings': () => import('../settings.js'),
+    // إضافة مسار السكريبت الخاص بصفحة إدارة البائعين
+    'manage-salespersons': () => import('../manage-salespersons.js'),
 };
 
 export function initPageLoader(appSettings) {

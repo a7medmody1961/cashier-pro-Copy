@@ -1,18 +1,12 @@
-<!--
-  File: src/views/pos.html
-  Description: Added a note icon placeholder for each invoice item.
--->
 <div class="pos-layout">
     <!-- قسم عرض المنتجات -->
      <div class="products-section-container">
     <div class="content-header">
-        <div class="search-and-quantity-controls"> <!-- div جديد لتجميع العناصر -->
+        <div class="search-and-quantity-controls"> 
             <input type="text" id="search-bar" placeholder="بحث عن منتج بالاسم أو الباركود...">
-            <!-- تم حذف مربع الكمية العلوي هنا -->
         </div>
     </div>
     <div id="product-grid" class="product-grid">
-        <!-- Product cards will be loaded here -->
     </div>
 </div>
 
@@ -50,6 +44,19 @@
         </div>
         <div id="customer-search-results"></div>
     </div>
+
+            <!-- إضافة حقل اختيار البائع هنا -->
+            <div class="form-group">
+                <label for="salesperson-select">البائع المسؤول (اختياري)</label>
+                <div class="custom-select-wrapper">
+                    <select id="salesperson-select">
+                        <option value="">-- لا يوجد بائع --</option>
+                        <!-- خيارات البائعين سيتم تحميلها ديناميكياً بواسطة JavaScript -->
+                    </select>
+                </div>
+            </div>
+            <!-- نهاية إضافة حقل اختيار البائع -->
+
         </div>
         <div id="invoice-items" class="invoice-items-list">
             <p class="empty-invoice">الفاتورة فارغة</p>
