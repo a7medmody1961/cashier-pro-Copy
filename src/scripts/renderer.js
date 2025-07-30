@@ -3,16 +3,48 @@ import { initClock } from './ui/clock.js';
 import { initTheme } from './ui/theme.js';
 import { initPageLoader } from './core/page-loader.js';
 import { initSidebar } from './ui/sidebar.js';
-// Tone.js is loaded globally via <script> tag in index.html, no import needed here.
+
+// ** START: Modified functions for loading indicator **
+/**
+ * Shows the global loading overlay.
+ * Adds 'visible' and 'opaque' classes for smooth transition and full coverage.
+ */
+export function showLoadingIndicator() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('visible'); // Make it display: flex and allow transition
+        // Add a slight delay before making it opaque to ensure it's rendered
+        setTimeout(() => {
+            loadingOverlay.classList.add('opaque'); // Make it fully opaque
+        }, 10); // Small delay, adjust if needed
+    }
+}
+
+/**
+ * Hides the global loading overlay.
+ * Removes 'opaque' and 'visible' classes.
+ */
+export function hideLoadingIndicator() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.classList.remove('opaque'); // Start fading out
+        // Wait for the fade-out transition to complete before setting display: none
+        loadingOverlay.addEventListener('transitionend', function handler() {
+            loadingOverlay.classList.remove('visible'); // Hide it completely
+            loadingOverlay.removeEventListener('transitionend', handler);
+        }, { once: true });
+    }
+}
+// ** END: Modified functions for loading indicator **
 
 document.addEventListener('DOMContentLoaded', () => {
     let clickSynth = null; // Initialize to null
-    // Load sound preference, default to true if not set
     let isSoundEnabled = localStorage.getItem('isSoundEnabled') !== 'false'; 
 
     async function main() {
         console.log("Starting main application initialization...");
-
+        
+        showLoadingIndicator(); // Use the exported function
         const appSettings = await window.api.getSettings();
         
         initClock();
@@ -28,16 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         AppState.setCurrentUser(currentUser);
 
-        // Build the sidebar navigation based on user permissions
         buildSidebarNav(JSON.parse(currentUser.permissions));
 
-        // Initialize the page loader (now correctly configured to handle data-view)
-        const pageLoader = initPageLoader(appSettings, currentUser);
+        // Pass showLoadingIndicator and hideLoadingIndicator to initPageLoader
+        const pageLoader = initPageLoader(appSettings, currentUser); 
         
-        // Initialize the sidebar (if it has specific functionalities beyond navigation)
         initSidebar(appSettings, currentUser);
 
-        // Navigate to the default page (e.g., 'pos') after everything is set up
         await pageLoader.navigateTo('pos'); 
         console.log("Application initialization complete.");
     }
@@ -49,12 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function buildSidebarNav(permissions) {
         const navContainer = document.getElementById('main-nav');
-        // Define all available pages and their properties
         const availablePages = [
             { id: 'pos', icon: 'fa-cash-register', label: 'نقطة البيع' },
             { id: 'manage-products', icon: 'fa-boxes-stacked', label: 'المنتجات' },
             { id: 'manage-customers', icon: 'fa-users', label: 'العملاء' },
-            // UPDATED: Changed label to "البائعين" for consistency
             { id: 'manage-salespersons', icon: 'fa-user-tie', label: 'البائعين' }, 
             { id: 'manage-expenses', icon: 'fa-file-invoice-dollar', label: 'المصروفات' },
             { id: 'reports', icon: 'fa-chart-line', label: 'التقارير' },
@@ -67,28 +94,24 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Navigation container #main-nav not found.");
             return;
         }
-        navContainer.innerHTML = ''; // Clear existing navigation items
+        navContainer.innerHTML = ''; 
 
-        // Create navigation links based on permissions
         availablePages.forEach(page => {
-            // Check if the user has permission for this page
             if (permissions && permissions[page.id]) { 
-                const link = document.createElement('a'); // Create <a> tag
+                const link = document.createElement('a'); 
                 link.className = 'nav-btn';
-                link.dataset.view = page.id; // Use data-view to match page-loader.js
+                link.dataset.view = page.id; 
                 link.innerHTML = `<i class="fa-solid ${page.icon} icon"></i> <span>${page.label}</span>`;
                 navContainer.appendChild(link);
             }
         });
     }
 
-    // Call main initialization function
     main().then(() => {
-        // Hide loader and show app layout after successful initialization
         document.getElementById('app-loader').style.display = 'none';
         document.querySelector('.app-layout').style.display = 'flex';
-        // Initialize audio after the main app is loaded and visible
         initializeAudio(); 
+        hideLoadingIndicator(); // Use the exported function
     }).catch(error => {
         console.error("Fatal error during application startup:", error);
         const loader = document.getElementById('app-loader');
@@ -101,14 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn btn-primary" onclick="window.location.reload()">إعادة تحميل التطبيق</button>
                 </div>
             `;
-            loader.style.display = 'flex'; // Ensure loader is visible to show error
+            loader.style.display = 'flex';
         }
+        hideLoadingIndicator(); // Use the exported function
     });
 
-    // Audio initialization and sound effects
     async function initializeAudio() {
         try {
-            // Check if Tone.js is loaded and context is not already running
             if (typeof Tone !== 'undefined') {
                 if (Tone.context.state !== 'running') {
                     await Tone.start();
@@ -117,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Audio context already running.");
                 }
 
-                if (!clickSynth) { // Only create synth if it doesn't exist
+                if (!clickSynth) {
                     clickSynth = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "triangle" },
                         envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.2 }
@@ -126,10 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 console.warn("Tone.js is not loaded. Sound effects will be disabled.");
-                isSoundEnabled = false; // Disable sound if Tone.js is not available
+                isSoundEnabled = false; 
             }
 
-            // Set initial state of the sound toggle button
             updateSoundToggleButton();
 
         } catch (error) {
@@ -145,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function playSoundEffect(soundName) {
         if (!isSoundEnabled) {
-            // console.log("Sound is disabled. Not playing:", soundName);
             return;
         }
         if (!clickSynth) {
@@ -174,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to update the sound toggle button's icon
     function updateSoundToggleButton() {
         const soundToggleButton = document.getElementById('sound-toggle-btn');
         if (soundToggleButton) {
@@ -182,13 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Listen for 'trigger-sound' event from the main process
     window.api.onTriggerSound((soundName) => {
         playSoundEffect(soundName);
     });
 
-    // Event listener for the sound toggle button
-    // Using a delegated event listener on document to catch clicks on dynamically loaded content
     document.addEventListener('click', (event) => {
         const targetButton = event.target.closest('#sound-toggle-btn');
         if (targetButton) {
@@ -196,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('isSoundEnabled', isSoundEnabled);
             updateSoundToggleButton();
             if (isSoundEnabled) {
-                // If sound is enabled, try to initialize audio if not already
                 initializeAudio(); 
                 console.log("Sound enabled.");
             } else {
@@ -204,10 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-
-    // Initial call to update button state when DOM is ready (before main() finishes)
-    // This ensures the button icon is correct on load even if main() takes time.
     updateSoundToggleButton(); 
-    // No need for DOMContentLoaded listener here, as main() is already wrapped in it.
-    // The main() function will call initializeAudio() at the end.
+
 });

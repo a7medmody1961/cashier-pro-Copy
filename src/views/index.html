@@ -17,6 +17,13 @@
         <p>جاري تحميل البيانات...</p>
     </div>
 
+    <!-- START: New Loading Overlay -->
+    <div id="loading-overlay" style="display: none;">
+        <div class="loader-spinner"></div>
+        <p>جاري المعالجة...</p>
+    </div>
+    <!-- END: New Loading Overlay -->
+
     <div class="app-layout" style="display: none;">
         <aside class="sidebar-container">
             <div class="sidebar-header">
@@ -24,7 +31,6 @@
                 <div id="user-info"></div>
             </div>
             <nav id="main-nav" class="main-navigation">
-                <!-- ALL navigation items MUST use data-view and NO href -->
                 <a class="nav-btn" data-view="pos"><i class="fa-solid fa-cash-register icon"></i> <span>نقطة البيع</span></a>
                 <a class="nav-btn" data-view="manage-products"><i class="fa-solid fa-boxes-stacked icon"></i> <span>المنتجات</span></a>
                 <a class="nav-btn" data-view="manage-customers"><i class="fa-solid fa-users icon"></i> <span>العملاء</span></a>
@@ -32,7 +38,6 @@
                 <a class="nav-btn" data-view="manage-expenses"><i class="fa-solid fa-money-bill-transfer icon"></i> <span>المصروفات</span></a>
                 <a class="nav-btn" data-view="reports"><i class="fa-solid fa-chart-line icon"></i> <span>التقارير</span></a>
                 <a class="nav-btn" data-view="manage-users"><i class="fa-solid fa-user-gear icon"></i> <span>المستخدمين</span></a>
-                <!-- NEW: Shift History link - ensure data-view is correct -->
                 <a class="nav-btn" data-view="shift-history">
                     <i class="fas fa-history icon"></i> <span>سجل الورديات</span>
                 </a>
@@ -44,7 +49,6 @@
             </div>
             <div class="sidebar-footer">
                 <div class="theme-switcher-container">
-                    <!-- NEW: Sound Toggle Button -->
                     <button id="sound-toggle-btn" class="btn">
                         <i class="fa-solid fa-volume-high"></i> <!-- Default icon, will be updated by JS -->
                     </button>
@@ -75,7 +79,7 @@
 
     <script src="../scripts/lib/sweetalert2.all.min.js"></script>
     <script src="../scripts/lib/chart.js"></script>
-    <script src="../scripts/lib/Tone.js"></script> <!-- Ensure this is NOT type="module" -->
+    <script src="../scripts/lib/Tone.js"></script>
     <script src="../scripts/renderer.js" type="module"></script>
 </body>
 </html>

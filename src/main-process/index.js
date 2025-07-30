@@ -14,7 +14,8 @@ const excelHandler = require('./excel-handler');
 const hardwareHandler = require('./hardware-handler');
 
 function initializeAllHandlers(ipcMain, getMainWindow) {
-    console.log("Initializing all IPC handlers...");   
+    console.log("Initializing all IPC handlers...");
+    
     authHandlers(ipcMain);
     productHandlers(ipcMain, getMainWindow);
     saleHandlers(ipcMain, getMainWindow);
@@ -29,6 +30,8 @@ function initializeAllHandlers(ipcMain, getMainWindow) {
     excelHandler(ipcMain, getMainWindow);
     hardwareHandler(ipcMain);
     salespersonHandlers(ipcMain); 
+
     console.log("...All handlers initialized successfully.");
 }
+
 module.exports = { initializeAllHandlers };
