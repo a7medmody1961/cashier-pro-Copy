@@ -1,3 +1,5 @@
+import { showLoadingIndicator, hideLoadingIndicator } from '../renderer.js'; // Import the new functions
+
 const pageScripts = {
     'pos': () => import('../pos-view.js'),
     'manage-products': () => import('../manage-products.js'),
@@ -7,11 +9,10 @@ const pageScripts = {
     'reports': () => import('../reports.js'),
     'settings': () => import('../settings.js'),
     'manage-salespersons': () => import('../manage-salespersons.js'),
-    // NEW: Add the shift-history page script
     'shift-history': () => import('../shift-history.js'), 
 };
 
-export function initPageLoader(appSettings, currentUser) { // Added currentUser parameter
+export function initPageLoader(appSettings, currentUser) { 
     const mainContent = document.getElementById('main-content');
     const navButtons = document.querySelectorAll('#main-nav .nav-btn');
 
@@ -21,23 +22,20 @@ export function initPageLoader(appSettings, currentUser) { // Added currentUser 
      */
     async function navigateTo(pageName) {
         try {
-            // Show loader before fetching new content
-            document.getElementById('app-loader').style.display = 'flex';
-            document.querySelector('.app-layout').style.display = 'none'; // Hide layout during loading
+            // Show the loading indicator immediately.
+            showLoadingIndicator(); 
 
-            // Check if pageName is valid before attempting to load
             if (!pageName || typeof pageName !== 'string') {
                 throw new Error("Invalid page name provided.");
             }
 
+            // Fetch HTML and load script
             const pageHtml = await window.api.getPageHtml(pageName);
-            mainContent.innerHTML = pageHtml;
+            mainContent.innerHTML = pageHtml; // Update content *behind* the overlay
 
-            // Check if a script needs to be initialized for the page
             if (pageScripts[pageName]) {
                 const pageModule = await pageScripts[pageName]();
                 if (pageModule.init) {
-                    // Pass appSettings and currentUser if the page script needs it
                     pageModule.init(appSettings, currentUser); 
                 }
             }
@@ -47,9 +45,11 @@ export function initPageLoader(appSettings, currentUser) { // Added currentUser 
                 btn.classList.toggle('active', btn.dataset.view === pageName); 
             });
 
-            // Hide loader after content is loaded and script initialized
-            document.getElementById('app-loader').style.display = 'none';
-            document.querySelector('.app-layout').style.display = 'flex'; // Show layout after loading
+            // Add a small delay before hiding the loading indicator
+            // This ensures the new content has time to render and paint
+            setTimeout(() => {
+                hideLoadingIndicator(); 
+            }, 100); // 100ms delay, adjust if needed for smoother feel
 
         } catch (error) {
             console.error(`Failed to navigate to ${pageName}:`, error);
@@ -61,11 +61,11 @@ export function initPageLoader(appSettings, currentUser) { // Added currentUser 
                     <button class="btn btn-primary" onclick="window.location.reload()">إعادة تحميل التطبيق</button>
                 </div>
             `;
-            // Hide loader even on error, and show the main layout to display the error message
-            document.getElementById('app-loader').style.display = 'none';
-            document.querySelector('.app-layout').style.display = 'flex'; 
+            // Hide the loading indicator even on error
+            setTimeout(() => {
+                hideLoadingIndicator(); 
+            }, 100); // 100ms delay, adjust if needed
 
-            // Display an error message to the user using SweetAlert2 if available
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'error',
@@ -80,13 +80,10 @@ export function initPageLoader(appSettings, currentUser) { // Added currentUser 
     // Add event listeners to navigation buttons
     navButtons.forEach(button => {
         button.addEventListener('click', (event) => {
-            // Prevent default link behavior
             event.preventDefault(); 
-            // Use dataset.view to get the page name
             navigateTo(button.dataset.view); 
         });
     });
 
-    // Return the navigateTo function for initial navigation
     return { navigateTo };
 }

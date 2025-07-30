@@ -9,9 +9,7 @@ const reportHandlers = require('./report-handlers');
 const customerHandlers = require('./customer-handlers');
 const licenseHandlers = require('./license-handler');
 const expenseHandlers = require('./expense-handlers');
-// إضافة استيراد لـ handlers البائعين
 const salespersonHandlers = require('./salesperson-handlers'); 
-// New handlers for Phase 3
 const excelHandler = require('./excel-handler');
 const hardwareHandler = require('./hardware-handler');
 
@@ -29,10 +27,8 @@ function initializeAllHandlers(ipcMain, getMainWindow) {
     customerHandlers(ipcMain);
     licenseHandlers(ipcMain);
     expenseHandlers(ipcMain);
-    // Initialize new handlers
     excelHandler(ipcMain, getMainWindow);
     hardwareHandler(ipcMain);
-    // تهيئة handlers البائعين
     salespersonHandlers(ipcMain); 
 
     console.log("...All handlers initialized successfully.");
