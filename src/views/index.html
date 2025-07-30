@@ -1,16 +1,11 @@
-<!-- 
-  File: src/views/index.html
--->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <!-- FIX: Added https://placehold.co to img-src to allow fallback images -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' file: data: https://placehold.co; worker-src blob:;">
     <title>كاشير برو</title>
     
-    <link rel="stylesheet" href="../scripts/lib/all.min.css"/> <!-- تم تعديل هذا السطر -->
-    
+    <link rel="stylesheet" href="../scripts/lib/all.min.css"/>     
     <link rel="stylesheet" href="../styles/theme.css">
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="../styles/management.css">
@@ -28,13 +23,31 @@
                 <h1 class="logo">كاشير برو</h1>
                 <div id="user-info"></div>
             </div>
-            <nav id="main-nav" class="main-navigation"></nav>
+            <nav id="main-nav" class="main-navigation">
+                <!-- ALL navigation items MUST use data-view and NO href -->
+                <a class="nav-btn" data-view="pos"><i class="fa-solid fa-cash-register icon"></i> <span>نقطة البيع</span></a>
+                <a class="nav-btn" data-view="manage-products"><i class="fa-solid fa-boxes-stacked icon"></i> <span>المنتجات</span></a>
+                <a class="nav-btn" data-view="manage-customers"><i class="fa-solid fa-users icon"></i> <span>العملاء</span></a>
+                <a class="nav-btn" data-view="manage-salespersons"><i class="fa-solid fa-user-tie icon"></i> <span>البائعين</span></a>
+                <a class="nav-btn" data-view="manage-expenses"><i class="fa-solid fa-money-bill-transfer icon"></i> <span>المصروفات</span></a>
+                <a class="nav-btn" data-view="reports"><i class="fa-solid fa-chart-line icon"></i> <span>التقارير</span></a>
+                <a class="nav-btn" data-view="manage-users"><i class="fa-solid fa-user-gear icon"></i> <span>المستخدمين</span></a>
+                <!-- NEW: Shift History link - ensure data-view is correct -->
+                <a class="nav-btn" data-view="shift-history">
+                    <i class="fas fa-history icon"></i> <span>سجل الورديات</span>
+                </a>
+                <a class="nav-btn" data-view="settings"><i class="fa-solid fa-gear icon"></i> <span>الإعدادات</span></a>
+            </nav>
             <div class="sidebar-shift-section">
                 <p id="shift-status">لا توجد وردية مفتوحة</p>
                 <button id="shift-btn" class="btn btn-secondary">بدء الوردية</button>
             </div>
             <div class="sidebar-footer">
                 <div class="theme-switcher-container">
+                    <!-- NEW: Sound Toggle Button -->
+                    <button id="sound-toggle-btn" class="btn">
+                        <i class="fa-solid fa-volume-high"></i> <!-- Default icon, will be updated by JS -->
+                    </button>
                     <button id="theme-switcher" class="btn"><i class="fa-solid fa-moon"></i></button>
                 </div>
                 <button id="logout-btn" class="nav-btn"><i class="fa-solid fa-right-from-bracket icon"></i> <span>تسجيل الخروج</span></button>
@@ -61,8 +74,8 @@
     </div>
 
     <script src="../scripts/lib/sweetalert2.all.min.js"></script>
-    <script src="../scripts/lib/chart.js"></script> <!-- أعد هذا السطر -->
-    <script src="../scripts/lib/Tone.js"></script> <!-- أضف هذا السطر هنا -->
+    <script src="../scripts/lib/chart.js"></script>
+    <script src="../scripts/lib/Tone.js"></script> <!-- Ensure this is NOT type="module" -->
     <script src="../scripts/renderer.js" type="module"></script>
 </body>
 </html>

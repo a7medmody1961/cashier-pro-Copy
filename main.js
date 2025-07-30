@@ -1,6 +1,3 @@
-// ==================================================================================
-// الملف الأول: main.js (النسخة الكاملة والنهائية)
-// ==================================================================================
 const { app, BrowserWindow, ipcMain, shell, dialog, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -11,9 +8,8 @@ let mainWindow = null;
 let loginWindow = null;
 let loggedInUser = null;
 
-// تطبيق سياسة الأمان فوراً عند تحميل التطبيق
-app.on('session-created', (session) => {
-    session.webRequest.onHeadersReceived((details, callback) => {
+app.on('session-created', (currentSession) => {
+    currentSession.webRequest.onHeadersReceived((details, callback) => {
         callback({
             responseHeaders: {
                 ...details.responseHeaders,
@@ -23,13 +19,12 @@ app.on('session-created', (session) => {
                     "style-src 'self' 'unsafe-inline';",
                     "img-src 'self' data: file: https://placehold.co;",
                     "font-src 'self' data:;",
-                    "worker-src blob:;" // أضف هذا السطر
+                    "worker-src blob:;"
                 ].join(' ')
             }
         });
     });
 });
-
 
 function createMainWindow() {
     if (mainWindow) {
@@ -37,10 +32,14 @@ function createMainWindow() {
         return;
     }
     mainWindow = new BrowserWindow({
-        width: 1366, height: 768, minWidth: 1100, minHeight: 750,
+        width: 1366,
+        height: 768,
+        minWidth: 1100,
+        minHeight: 750,
         webPreferences: { preload: path.join(__dirname, 'preload.js') },
         icon: path.join(__dirname, 'src/assets/icons/icon.png'),
-        show: false, backgroundColor: '#0f172a'
+        show: false,
+        backgroundColor: '#0f172a'
     });
     mainWindow.once('ready-to-show', () => mainWindow.show());
     mainWindow.loadFile(path.join(__dirname, 'src', 'views', 'index.html'));
@@ -53,7 +52,10 @@ function createLoginWindow() {
         return;
     }
     loginWindow = new BrowserWindow({
-        width: 500, height: 650, resizable: false, frame: true,
+        width: 500,
+        height: 650,
+        resizable: false,
+        frame: true,
         webPreferences: { preload: path.join(__dirname, 'preload.js') },
         show: false,
     });
@@ -64,7 +66,10 @@ function createLoginWindow() {
 
 function createLicenseWindow() {
     const licenseWindow = new BrowserWindow({
-        width: 500, height: 450, resizable: false, frame: true,
+        width: 500,
+        height: 450,
+        resizable: false,
+        frame: true,
         webPreferences: { preload: path.join(__dirname, 'preload.js') }
     });
     licenseWindow.loadFile(path.join(__dirname, 'src', 'views', 'license.html'));
@@ -86,10 +91,11 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
-// --- تم تعديل هذا الجزء ---
 ipcMain.on('license-validated', () => {
     BrowserWindow.getAllWindows().forEach(win => {
         if (win.webContents.getURL().includes('license.html')) {
@@ -106,12 +112,16 @@ ipcMain.on('login-successful', (event, user) => {
     mainWindow.webContents.on('did-finish-load', () => {
         mainWindow.webContents.send('user-data', user);
     });
-    if (senderWindow) senderWindow.close();
+    if (senderWindow) {
+        senderWindow.close();
+    }
 });
 
 ipcMain.on('app:logout', () => {
     loggedInUser = null;
-    if (mainWindow) mainWindow.close();
+    if (mainWindow) {
+        mainWindow.close();
+    }
     createLoginWindow();
 });
 

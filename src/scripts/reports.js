@@ -1,10 +1,6 @@
-/*
-  File: src/scripts/reports.js
-  Version: 1.3
-  Description: Manages all logic for the reports page.
-  - (FIX) Corrected the import path for invoice-template.js to fix critical loading error.
-*/
 import { generateInvoiceHTML } from './invoice-template.js';
+// استيراد دالة showPreviewModal من modal-helpers.js
+import { showPreviewModal } from './ui/modal-helpers.js'; 
 
 export function init(appSettings) {
     let peakHoursChartInstance = null;
@@ -59,12 +55,12 @@ export function init(appSettings) {
         if (target.classList.contains('details-btn')) {
             try {
                 const { saleDetails, saleItems } = await window.api.getSaleDetails(saleId);
-                const invoiceHtml = generateInvoiceHTML(saleDetails, saleItems, appSettings);
-                window.api.openPreviewWindow({
-                    content: invoiceHtml,
-                    title: `تفاصيل الفاتورة رقم ${saleId}`
-                });
+                // تمرير appSettings إلى generateInvoiceHTML
+                const invoiceHtml = generateInvoiceHTML(saleDetails, saleItems, appSettings); 
+                // استخدام showPreviewModal بدلاً من window.api.openPreviewWindow
+                showPreviewModal(`تفاصيل الفاتورة رقم ${saleId}`, invoiceHtml);
             } catch (error) {
+                console.error('Failed to get sale details or generate invoice:', error); // سجل الخطأ للمطور
                 Swal.fire('خطأ!', 'فشل عرض تفاصيل الفاتورة.', 'error');
             }
         }
@@ -96,8 +92,8 @@ export function init(appSettings) {
         const refundedSales = sales.filter(s => s.status === 'refunded');
         const totalRevenue = completedSales.reduce((sum, s) => sum + s.total_amount, 0);
         const totalRefunds = refundedSales.reduce((sum, s) => sum + s.total_amount, 0);
-        const netRevenue = totalRevenue + totalRefunds;
-        
+        const netRevenue = totalRevenue + totalRefunds; // يجب أن تكون المرتجعات بقيمة سالبة لخصمها
+
         totalRevenueEl.textContent = formatCurrency(netRevenue);
         totalInvoicesEl.textContent = completedSales.length;
         totalExpensesEl.textContent = formatCurrency(expenses);
@@ -174,13 +170,10 @@ export function init(appSettings) {
 
         if (filter === 'week') {
             const dayOfWeek = start.getDay();
-            // تعديل الأحد ليكون اليوم الأخير في الأسبوع وليس الأول
             start.setDate(start.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); 
         } else if (filter === 'month') {
             start.setDate(1);
         }
-
-        // تم التعديل: دالة لإنشاء سلسلة نصية للتاريخ والوقت بالتوقيت المحلي لـ SQLite
         const toSQLiteString = (date) => {
             const year = date.getFullYear();
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -195,12 +188,11 @@ export function init(appSettings) {
     }
 
     function formatCurrency(amount) {
-        return new Intl.NumberFormat('ar-EG', { style: 'currency', currency: 'EGP' }).format(amount || 0);
+        // استخدام appSettings.currency بدلاً من 'EGP' الثابت
+        return new Intl.NumberFormat('ar-EG', { style: 'currency', currency: appSettings.currency || 'EGP' }).format(amount || 0);
     }
 
-    // جديد: الاستماع لإشارة تحديث المبيعات عند تهيئة الصفحة
     window.api.onSalesUpdate(loadAllReports);
 
-    // تحميل البيانات الأولية عند تهيئة الصفحة
     loadAllReports('today');
 }

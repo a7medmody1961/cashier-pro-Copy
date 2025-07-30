@@ -1,9 +1,3 @@
-/*
-  File: src/scripts/manage-users.js
-  Version: 1.1
-  Changes:
-  - (Task 6 - Permissions) Updated to manage the new permissions checkboxes instead of the role dropdown.
-*/
 export function init() {
     console.log("User management script initialized.");
 

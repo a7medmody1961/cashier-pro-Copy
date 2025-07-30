@@ -1,7 +1,5 @@
-// src/scripts/ui/sidebar.js
-
 import AppState from '../core/app-state.js';
-import { showPreviewModal } from './modal-helpers.js'; // تم إضافة هذا السطر
+import { showPreviewModal } from './modal-helpers.js';
 
 export function initSidebar(appSettings, currentUser) {
     const shiftBtn = document.getElementById('shift-btn');
@@ -22,8 +20,7 @@ export function initSidebar(appSettings, currentUser) {
         console.log("Initializing shift status...");
         const activeShift = await window.api.getActiveShift();
         if (activeShift) {
-            window.AppState.setActiveShift(activeShift); // تحديث حالة الوردية في AppState
-            // السطر المعدل: إضافة اسم الكاشير ووقت البدء
+            window.AppState.setActiveShift(activeShift);
             shiftStatusP.innerHTML = `تم بدء الوردية بواسطة: <strong>${activeShift.username}</strong><br>وردية مفتوحة: ${new Date(activeShift.start_time).toLocaleTimeString()}`;
             shiftBtn.textContent = 'إنهاء الوردية';
             shiftBtn.classList.remove('btn-secondary');

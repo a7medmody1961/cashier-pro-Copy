@@ -1,0 +1,44 @@
+<!-- src/views/manage-salespersons.html -->
+<div class="management-container">
+    <h1>إدارة البائعين</h1>
+    <div class="form-container">
+        <h2>إضافة / تعديل بائع</h2>
+        <form id="salesperson-form">
+            <input type="hidden" id="salesperson-id">
+            <div class="form-grid-columns">
+                <div class="form-group">
+                    <label for="salesperson-name">اسم البائع</label>
+                    <input type="text" id="salesperson-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="salesperson-phone">ID (اختياري)</label>
+                    <input type="text" id="salesperson-phone">
+                </div>
+                <!-- إضافة الكلاس checkbox-group هنا -->
+                <div class="form-group checkbox-group">
+                    <label for="salesperson-is-active">نشط</label>
+                    <input type="checkbox" id="salesperson-is-active" checked>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">حفظ البائع</button>
+                <button type="button" id="clear-salesperson-form-btn" class="btn btn-secondary">مسح الحقول</button>
+            </div>
+        </form>
+    </div>
+    <div class="table-container">
+        <h2>قائمة البائعين</h2>
+        <table id="salespersons-table">
+            <thead>
+                <tr>
+                    <th>اسم البائع</th>
+                    <th>ID</th>
+                    <th>الحالة</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>

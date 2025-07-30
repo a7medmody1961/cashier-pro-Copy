@@ -1,9 +1,3 @@
-/*
-  File: src/main-process/index.js
-  Version: 2.2
-  Changes:
-  - Added new handlers for Excel, PDF printing, and hardware.
-*/
 const authHandlers = require('./auth-handlers');
 const productHandlers = require('./product-handlers');
 const saleHandlers = require('./sale-handlers');
@@ -15,13 +9,12 @@ const reportHandlers = require('./report-handlers');
 const customerHandlers = require('./customer-handlers');
 const licenseHandlers = require('./license-handler');
 const expenseHandlers = require('./expense-handlers');
-// New handlers for Phase 3
+const salespersonHandlers = require('./salesperson-handlers'); 
 const excelHandler = require('./excel-handler');
 const hardwareHandler = require('./hardware-handler');
 
 function initializeAllHandlers(ipcMain, getMainWindow) {
-    console.log("Initializing all IPC handlers...");
-    
+    console.log("Initializing all IPC handlers...");   
     authHandlers(ipcMain);
     productHandlers(ipcMain, getMainWindow);
     saleHandlers(ipcMain, getMainWindow);
@@ -33,11 +26,9 @@ function initializeAllHandlers(ipcMain, getMainWindow) {
     customerHandlers(ipcMain);
     licenseHandlers(ipcMain);
     expenseHandlers(ipcMain);
-    // Initialize new handlers
     excelHandler(ipcMain, getMainWindow);
     hardwareHandler(ipcMain);
-
+    salespersonHandlers(ipcMain); 
     console.log("...All handlers initialized successfully.");
 }
-
 module.exports = { initializeAllHandlers };
