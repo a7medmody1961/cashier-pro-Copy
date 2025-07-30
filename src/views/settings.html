@@ -1,0 +1,106 @@
+<div class="management-container">
+    <h1>إعدادات البرنامج</h1>
+    <form id="settings-form">
+        <div class="form-container general-settings">
+            <h3>الإعدادات العامة</h3>
+            <div class="form-grid-columns">
+                <div class="form-group"><label for="storeName">اسم المتجر (للفاتورة)</label><input type="text" id="storeName"></div>
+                <div class="form-group"><label for="storePhone">رقم هاتف المتجر (للفاتورة)</label><input type="text" id="storePhone"></div>
+                <div class="form-group">
+                    <label for="currency">العملة</label>
+                    <div class="custom-select-wrapper">
+                        <select id="currency">
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                            <option value="JPY">JPY (¥)</option>
+                            <option value="CHF">CHF (CHF)</option>
+                            <option value="CAD">CAD (C$)</option>
+                            <option value="AUD">AUD (A$)</option>
+                            <option value="CNY">CNY (¥)</option>
+                            <option value="INR">INR (₹)</option>
+                            <option value="BRL">BRL (R$)</option>
+                            <option value="RUB">RUB (₽)</option>
+                            <option value="MXN">MXN (Mex$)</option>
+                            <option value="SGD">SGD (S$)</option>
+                            <option value="HKD">HKD (HK$)</option>
+                            <option value="KRW">KRW (₩)</option>
+                            <option value="ZAR">ZAR (R)</option>
+                            <option value="TRY">TRY (₺)</option>
+                            <option value="SEK">SEK (kr)</option>
+                            <option value="NOK">NOK (kr)</option>
+                            <option value="DKK">DKK (kr)</option>
+                            <option value="PLN">PLN (zł)</option>
+                            <option value="HUF">HUF (Ft)</option>
+                            <option value="CZK">CZK (Kč)</option>
+                            <option value="NZD">NZD (NZ$)</option>
+                            <option value="PHP">PHP (₱)</option>
+                            <option value="THB">THB (฿)</option>
+                            <option value="IDR">IDR (Rp)</option>
+                            <option value="MYR">MYR (RM)</option>
+                            <option value="VND">VND (₫)</option>
+                            <option value="EGP">EGP (ج.م)</option>
+                            <option value="SAR">SAR (ر.س)</option>
+                            <option value="AED">AED (د.إ)</option>
+                            <option value="KWD">KWD (د.ك)</option>
+                            <option value="BHD">BHD (د.ب)</option>
+                            <option value="OMR">OMR (ر.ع)</option>
+                            <option value="QAR">QAR (ر.ق)</option>
+                            <option value="JOD">JOD (د.أ)</option>
+                            <option value="LBP">LBP (ل.ل)</option>
+                            <option value="SYP">SYP (ل.س)</option>
+                            <option value="IQD">IQD (ع.د)</option>
+                            <option value="DZD">DZD (د.ج)</option>
+                            <option value="MAD">MAD (د.م)</option>
+                            <option value="TND">TND (د.ت)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-container">
+            <h3>الضرائب والرسوم (في الصالة)</h3>
+            <div class="form-grid-columns">
+                <div class="form-group"><label for="vatValueDineIn">قيمة ضريبة القيمة المضافة (VAT)</label><input type="number" id="vatValueDineIn" step="0.01" min="0"></div>
+                <div class="form-group"><label for="vatTypeDineIn">نوع الضريبة</label><div class="custom-select-wrapper"><select id="vatTypeDineIn"><option value="percentage">نسبة مئوية (%)</option><option value="fixed">مبلغ ثابت</option></select></div></div>
+                <div class="form-group"><label for="serviceValueDineIn">قيمة رسوم الخدمة</label><input type="number" id="serviceValueDineIn" step="0.01" min="0"></div>
+                <div class="form-group"><label for="serviceTypeDineIn">نوع رسوم الخدمة</label><div class="custom-select-wrapper"><select id="serviceTypeDineIn"><option value="percentage">نسبة مئوية (%)</option><option value="fixed">مبلغ ثابت</option></select></div></div>
+            </div>
+        </div>
+        <div class="form-container">
+            <h3>الضرائب والرسوم (للدليفري)</h3>
+            <div class="form-grid-columns">
+                <div class="form-group"><label for="deliveryFee">رسوم التوصيل</label><input type="number" id="deliveryFee" step="0.01" min="0"></div>
+                <div class="form-group"><label for="vatValueDelivery">قيمة ضريبة القيمة المضافة (VAT)</label><input type="number" id="vatValueDelivery" step="0.01" min="0"></div>
+                <div class="form-group"><label for="vatTypeDelivery">نوع الضريبة</label><div class="custom-select-wrapper"><select id="vatTypeDelivery"><option value="percentage">نسبة مئوية (%)</option><option value="fixed">مبلغ ثابت</option></select></div></div>
+                <div class="form-group"><label for="serviceValueDelivery">قيمة رسوم الخدمة</label><input type="number" id="serviceValueDelivery" step="0.01" min="0"></div>
+                <div class="form-group"><label for="serviceTypeDelivery">نوع رسوم الخدمة</label><div class="custom-select-wrapper"><select id="serviceTypeDelivery"><option value="percentage">نسبة مئوية (%)</option><option value="fixed">مبلغ ثابت</option></select></div></div>
+            </div>
+        </div>
+
+        <div class="form-container loyalty-settings">
+            <h3>إعدادات نقاط الولاء</h3>
+            <div class="form-grid-columns">
+                <div class="form-group">
+                    <label for="pointsEarnRate">عدد النقاط المكتسبة لكل مبلغ (مثال: 1 نقطة لكل 10 ج.م)</label>
+                    <input type="number" id="pointsEarnRate" step="0.01" min="0">
+                    <p class="help-text">أدخل المبلغ الذي يمنح نقطة واحدة (مثال: 10 إذا كانت كل 10 ج.م تساوي 1 نقطة).</p>
+                </div>
+                <div class="form-group">
+                    <label for="pointsRedeemValue">قيمة النقطة الواحدة (مثال: 1 نقطة = 0.10 ج.م)</label>
+                    <input type="number" id="pointsRedeemValue" step="0.01" min="0">
+                    <p class="help-text">أدخل القيمة النقدية للنقطة الواحدة (مثال: 0.10 إذا كانت النقطة الواحدة تساوي 10 قروش).</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <h3>أذونات المستخدمين (تعديل الصلاحيات)</h3>
+            <p class="help-text">حدد الصفحات التي يمكن للمستخدمين الوصول إليها. هذه الصلاحيات تنطبق على المستخدم الحالي.</p>
+            <div class="form-grid-columns" id="permissions-checkboxes">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.2em;">حفظ الإعدادات</button>
+    </form>
+</div>
