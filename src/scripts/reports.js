@@ -144,13 +144,16 @@ export function init(appSettings) {
 
     // Updated renderKpis function
     function renderKpis(sales, analyticsData) {
-        const completedSales = sales.filter(s => s.status === 'completed');
-        const refundedSales = sales.filter(s => s.status === 'refunded');
-
-        const totalRevenueGross = completedSales.reduce((sum, s) => sum + s.total_amount, 0);
-        const totalRefundsAmount = refundedSales.reduce((sum, s) => sum + s.total_amount, 0); // Assuming positive amount for refunds
+        // يجب أن نأخذ في الاعتبار أن الفواتير المرتجعة (سواء الأصلية أو سجل الإرجاع) تؤثر على الإيرادات
+        // هنا، سنحسب الإيرادات الإجمالية من الفواتير المكتملة فقط، ثم نطرح منها قيمة الفواتير المرتجعة
+        // (سجلات الإرجاع التي تكون قيمتها سالبة)
+        const totalRevenueGross = sales.filter(s => s.status === 'completed' && s.original_sale_id === null)
+                                       .reduce((sum, s) => sum + s.total_amount, 0);
         
-        // Net Revenue (Gross Sales - Refunds)
+        const totalRefundsAmount = sales.filter(s => s.status === 'refunded' && s.original_sale_id !== null)
+                                        .reduce((sum, s) => sum + Math.abs(s.total_amount), 0);
+        
+        // صافي المبيعات = إجمالي المبيعات (المكتملة) - إجمالي المبالغ المرتجعة
         const netSales = totalRevenueGross - totalRefundsAmount;
 
         const totalExpenses = analyticsData.totalExpenses || 0; // From backend
@@ -159,8 +162,9 @@ export function init(appSettings) {
         const grossProfit = netSales - totalCostOfGoodsSold; // صافي الربح (الإيرادات بعد المرتجعات - تكلفة المنتجات)
         const netProfitAfterExpenses = grossProfit - totalExpenses; // صافي الربح بعد المصروفات
 
-        totalInvoicesEl.textContent = completedSales.length;
-        totalRevenueEl.textContent = formatCurrency(totalRevenueGross); // إجمالي المبيعات (الخام قبل خصم المرتجعات)
+        // عدد الفواتير المكتملة فقط (لا تشمل سجلات الإرجاع)
+        totalInvoicesEl.textContent = sales.filter(s => s.status === 'completed' && s.original_sale_id === null).length;
+        totalRevenueEl.textContent = formatCurrency(netSales); // عرض صافي المبيعات هنا
         costOfGoodsSoldEl.textContent = formatCurrency(totalCostOfGoodsSold);
         grossProfitEl.textContent = formatCurrency(grossProfit);
         totalExpensesEl.textContent = formatCurrency(totalExpenses);
@@ -168,21 +172,42 @@ export function init(appSettings) {
     }
 
     function renderSalesTable(sales) {
-        salesTableBody.innerHTML = sales.map(s => `
-            <tr>
-                <td>${s.id}</td>
-                <td>${s.username || 'N/A'}</td>
-                <td>${s.customer_name || 'بدون اسم'}</td>
-                <td><span class="status ${s.status}">${s.status === 'completed' ? 'مكتملة' : 'مرتجع'}</span></td>
-                <td>${formatCurrency(s.total_amount)}</td>
-                <td>${s.payment_method}</td>
-                <td>${new Date(s.created_at).toLocaleString('ar-EG')}</td>
-                <td class="actions-cell">
-                    <button class="btn btn-secondary details-btn" data-id="${s.id}">التفاصيل</button>
-                    ${s.status === 'completed' ? `<button class="btn btn-danger refund-btn" data-id="${s.id}">إرجاع</button>` : ''}
-                </td>
-            </tr>
-        `).join('');
+        // تصفية الفواتير: نعرض فقط الفواتير الأصلية (سواء مكتملة أو مرتجعة)
+        // ونستبعد سجلات الإرجاع التي لها original_sale_id
+        const salesToDisplay = sales.filter(s => s.original_sale_id === null || s.status === 'completed');
+
+        salesTableBody.innerHTML = salesToDisplay.map(s => {
+            let rowClass = '';
+            let statusText = 'مكتملة';
+            let refundButton = ''; // زر الإرجاع
+
+            // إذا كانت الفاتورة الأصلية حالتها 'refunded'
+            if (s.status === 'refunded') {
+                rowClass = 'refunded-original-sale'; // كلاس جديد لتطبيق التنسيق المشطوب
+                statusText = 'مرتجع';
+                // لا يوجد زر إرجاع لفاتورة تم إرجاعها بالفعل
+                refundButton = '';
+            } else {
+                // إذا كانت الفاتورة مكتملة، نعرض زر الإرجاع
+                refundButton = `<button class="btn btn-danger refund-btn" data-id="${s.id}">إرجاع</button>`;
+            }
+
+            return `
+                <tr class="${rowClass}">
+                    <td>${s.id}</td>
+                    <td>${s.username || 'N/A'}</td>
+                    <td>${s.customer_name || 'بدون اسم'}</td>
+                    <td><span class="status ${s.status}">${statusText}</span></td>
+                    <td>${formatCurrency(s.total_amount)}</td>
+                    <td>${s.payment_method}</td>
+                    <td>${new Date(s.created_at).toLocaleString('ar-EG')}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-secondary details-btn" data-id="${s.id}">التفاصيل</button>
+                        ${refundButton}
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     function renderBestSellers(data) {

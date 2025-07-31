@@ -135,8 +135,28 @@ module.exports = (ipcMain, getMainWindow) => {
 
                 const originalItems = db.prepare("SELECT * FROM sale_items WHERE sale_id = ?").all(saleId);
                 
-                const refundSaleSql = `INSERT INTO sales (user_id, shift_id, customer_id, salesperson_id, order_type, total_amount, sub_total, vat_amount, service_amount, delivery_fee_amount, payment_method, status, original_sale_id, refunded_by_user_id, refunded_at, manual_discount_amount, manual_discount_type, loyalty_points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'refunded', ?, ?, datetime('now', 'localtime'), ?, ?, ?)`; 
-                const refundResult = db.prepare(refundSaleSql).run(originalSale.user_id, originalSale.shift_id, originalSale.customer_id, originalSale.salesperson_id, originalSale.order_type, -originalSale.total_amount, -originalSale.sub_total, -originalSale.vat_amount, -originalSale.service_amount, -originalSale.delivery_fee_amount, originalSale.payment_method, saleId, userId, originalSale.manual_discount_amount, originalSale.manual_discount_type, -originalSale.loyalty_points); 
+                // تم التعديل: جعل جميع القيم في جملة INSERT كـ parameters
+                const refundSaleSql = `INSERT INTO sales (user_id, shift_id, customer_id, salesperson_id, order_type, total_amount, sub_total, vat_amount, service_amount, delivery_fee_amount, payment_method, status, original_sale_id, refunded_by_user_id, refunded_at, manual_discount_amount, manual_discount_type, loyalty_points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`; 
+                const refundResult = db.prepare(refundSaleSql).run(
+                    originalSale.user_id,
+                    originalSale.shift_id,
+                    originalSale.customer_id,
+                    originalSale.salesperson_id,
+                    originalSale.order_type,
+                    -originalSale.total_amount,
+                    -originalSale.sub_total,
+                    -originalSale.vat_amount,
+                    -originalSale.service_amount,
+                    -originalSale.delivery_fee_amount,
+                    originalSale.payment_method,
+                    'refunded', // قيمة صريحة للحالة
+                    saleId, // original_sale_id
+                    userId, // refunded_by_user_id
+                    new Date().toISOString().slice(0, 19).replace('T', ' '), // تاريخ ووقت الإرجاع بتنسيق SQLite
+                    originalSale.manual_discount_amount,
+                    originalSale.manual_discount_type,
+                    -originalSale.loyalty_points
+                ); 
                 const refundSaleId = refundResult.lastInsertRowid;
 
                 const itemStmt = db.prepare("INSERT INTO sale_items (sale_id, product_id, product_name, quantity, price_per_item) VALUES (?, ?, ?, ?, ?)");
