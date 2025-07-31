@@ -8,10 +8,12 @@
             <button class="btn filter-btn" data-filter="month">هذا الشهر</button>
         </div>
         <div class="kpi-container">
-            <div class="kpi-card"><h4 >إجمالي المبيعات</h4><span id="total-revenue">0.00</span></div>
             <div class="kpi-card"><h4 >عدد الفواتير</h4><span id="total-invoices">0</span></div>
-            <div class="kpi-card total-expenses"><h4 >إجمالي المصروفات</h4><span id="total-expenses">0.00</span></div>
-            <div class="kpi-card net-profit"><h4 >صافي الربح</h4><span id="net-profit">0.00</span></div>
+            <div class="kpi-card"><h4 >إجمالي المبيعات</h4><span id="total-revenue">0.00</span></div>
+            <div class="kpi-card cost-of-goods-sold"><h4 >تكلفة المنتجات المباعة</h4><span id="cost-of-goods-sold">0.00</span></div>
+            <div class="kpi-card gross-profit"><h4 >صافي الربح</h4><span id="gross-profit">0.00</span></div>
+            <div class="kpi-card total-expenses"><h4 >المصروفات</h4><span id="total-expenses">0.00</span></div>
+            <div class="kpi-card net-profit-after-expenses"><h4 >صافي الربح بعد المصروفات</h4><span id="net-profit-after-expenses">0.00</span></div>
         </div>
     </div>
     <div class="analytics-grid">
@@ -27,6 +29,11 @@
     </div>
     <div class="table-container" style="margin-top: 20px;">
         <h2>قائمة المبيعات التفصيلية</h2>
+        <div class="search-bar" style="margin-bottom: 10px; display: flex; gap: 10px;">
+            <input type="text" id="invoice-search-input" placeholder="البحث برقم الفاتورة..." class="form-control" style="flex-grow: 1;">
+            <button class="btn btn-primary" id="search-invoice-btn">بحث</button>
+            <button class="btn btn-secondary" id="clear-invoice-search-btn">مسح</button>
+        </div>
         <table id="sales-table"><thead><tr><th>#</th><th>الكاشير</th><th>العميل</th><th>الحالة</th><th>الإجمالي</th><th>الدفع</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
     </div>
 </div>

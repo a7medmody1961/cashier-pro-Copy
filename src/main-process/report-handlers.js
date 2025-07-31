@@ -1,12 +1,13 @@
-// ==================================================================================
-// الملف الخامس: src/main-process/report-handlers.js (تم التحديث لإضافة الخصم اليدوي)
-// الشرح: تم تعديل الدالة لإظهار إجمالي الخصومات اليدوية في التقارير التحليلية.
-// ==================================================================================
 const db = require('../../database');
 
 module.exports = (ipcMain) => {
     ipcMain.handle('reports:get-analytics', (event, dateRange) => {
         try {
+            if (!dateRange || typeof dateRange.start === 'undefined' || typeof dateRange.end === 'undefined') {
+                console.error("Invalid dateRange received for reports:get-analytics:", dateRange);
+                return { success: false, error: "Invalid date range provided to analytics handler." };
+            }
+
             const params = [dateRange.start, dateRange.end];
             const sales = db.prepare(`SELECT COUNT(id) as order_count, SUM(total_amount) as total_revenue FROM sales WHERE status = 'completed' AND created_at BETWEEN ? AND ?`).get(params);
             const expenses = db.prepare(`SELECT SUM(amount) as total_expenses FROM expenses WHERE created_at BETWEEN ? AND ?`).get(params);
@@ -17,20 +18,31 @@ module.exports = (ipcMain) => {
             // إضافة استعلام لجلب إجمالي الخصومات اليدوية
             const manualDiscounts = db.prepare(`SELECT SUM(manual_discount_amount) as total_manual_discount FROM sales WHERE status = 'completed' AND created_at BETWEEN ? AND ?`).get(params);
 
+            // New: استعلام لجلب تكلفة المنتجات المباعة (COGS)
+            const costOfGoodsSold = db.prepare(`
+                SELECT SUM(si.quantity * p.cost_price) as total_cogs
+                FROM sale_items si
+                JOIN sales s ON si.sale_id = s.id
+                JOIN products p ON si.product_id = p.id
+                WHERE s.created_at BETWEEN ? AND ? AND s.status = 'completed'
+            `).get(params);
+
             const revenue = sales.total_revenue || 0;
             const totalExpenses = expenses.total_expenses || 0;
-            const totalManualDiscount = manualDiscounts.total_manual_discount || 0; // القيمة الإجمالية للخصومات اليدوية
+            const totalManualDiscount = manualDiscounts.total_manual_discount || 0;
+            const cogs = costOfGoodsSold.total_cogs || 0; // Cost of Goods Sold
 
             return {
                 success: true,
                 order_count: sales.order_count || 0,
                 total_revenue: revenue,
                 totalExpenses: totalExpenses,
-                net_profit: revenue - totalExpenses,
+                // net_profit القديم لن نستخدمه مباشرة في الواجهة
                 bestSellers: top_products,
                 cashierPerformance: cashier_performance,
                 peakHours: peak_hours,
-                totalManualDiscount: totalManualDiscount // تضمين إجمالي الخصم اليدوي
+                totalManualDiscount: totalManualDiscount,
+                totalCostOfGoodsSold: cogs // تضمين تكلفة المنتجات المباعة
             };
         } catch (error) {
             console.error("Failed to get analytics:", error);

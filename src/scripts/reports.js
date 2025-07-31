@@ -1,6 +1,6 @@
+// cashier-pro-Copy/src/scripts/reports.js
 import { generateInvoiceHTML } from './invoice-template.js';
-// استيراد دالة showPreviewModal من modal-helpers.js
-import { showPreviewModal } from './ui/modal-helpers.js'; 
+import { showPreviewModal } from './ui/modal-helpers.js';
 
 export function init(appSettings) {
     let peakHoursChartInstance = null;
@@ -8,11 +8,19 @@ export function init(appSettings) {
     const totalRevenueEl = document.getElementById('total-revenue');
     const totalInvoicesEl = document.getElementById('total-invoices');
     const totalExpensesEl = document.getElementById('total-expenses');
-    const netProfitEl = document.getElementById('net-profit');
+    const costOfGoodsSoldEl = document.getElementById('cost-of-goods-sold');
+    const grossProfitEl = document.getElementById('gross-profit');
+    const netProfitAfterExpensesEl = document.getElementById('net-profit-after-expenses');
+
     const salesTableBody = document.querySelector('#sales-table tbody');
     const bestSellersTableBody = document.querySelector('#best-sellers-table tbody');
     const cashierPerformanceTableBody = document.querySelector('#cashier-performance-table tbody');
     const peakHoursChartCanvas = document.getElementById('peak-hours-chart')?.getContext('2d');
+
+    const invoiceSearchInput = document.getElementById('invoice-search-input'); // New
+    const searchInvoiceBtn = document.getElementById('search-invoice-btn');     // New
+    const clearInvoiceSearchBtn = document.getElementById('clear-invoice-search-btn'); // New
+
 
     if (!filterButtons.length || !peakHoursChartCanvas) return;
 
@@ -20,14 +28,34 @@ export function init(appSettings) {
         button.addEventListener('click', () => {
             filterButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
+            invoiceSearchInput.value = ''; // Clear search input when filter changes
             loadAllReports(button.dataset.filter);
         });
+    });
+
+    // New Event Listeners for search
+    searchInvoiceBtn.addEventListener('click', () => {
+        const invoiceId = invoiceSearchInput.value.trim();
+        if (invoiceId) {
+            // Deactivate all filter buttons when searching by invoice ID
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            loadAllReports(null, invoiceId); // Pass null for filter, and invoiceId
+        } else {
+            // If search input is empty, reload reports based on active filter
+            loadAllReports(document.querySelector('.filter-btn.active')?.dataset.filter || 'today');
+        }
+    });
+
+    clearInvoiceSearchBtn.addEventListener('click', () => {
+        invoiceSearchInput.value = '';
+        // Reload reports based on active filter
+        loadAllReports(document.querySelector('.filter-btn.active')?.dataset.filter || 'today');
     });
 
     salesTableBody.addEventListener('click', async (e) => {
         const target = e.target.closest('button');
         if (!target) return;
-        
+
         const saleId = parseInt(target.dataset.id);
 
         if (target.classList.contains('refund-btn')) {
@@ -45,59 +73,98 @@ export function init(appSettings) {
                     const currentUser = window.AppState.getCurrentUser();
                     await window.api.processRefund({ saleId, userId: currentUser.id });
                     Swal.fire('تم!', 'تمت عملية الإرجاع بنجاح.', 'success');
-                    loadAllReports(document.querySelector('.filter-btn.active').dataset.filter);
+                    // Reload reports after refund, considering current search/filter
+                    const currentFilter = document.querySelector('.filter-btn.active')?.dataset.filter;
+                    const currentInvoiceSearch = invoiceSearchInput.value.trim();
+                    loadAllReports(currentFilter, currentInvoiceSearch);
                 } catch (error) {
                     Swal.fire('خطأ!', error.message || 'فشلت عملية الإرجاع.', 'error');
                 }
             }
         }
-        
+
         if (target.classList.contains('details-btn')) {
             try {
                 const { saleDetails, saleItems } = await window.api.getSaleDetails(saleId);
-                // تمرير appSettings إلى generateInvoiceHTML
-                const invoiceHtml = generateInvoiceHTML(saleDetails, saleItems, appSettings); 
-                // استخدام showPreviewModal بدلاً من window.api.openPreviewWindow
+                const invoiceHtml = generateInvoiceHTML(saleDetails, saleItems, appSettings);
                 showPreviewModal(`تفاصيل الفاتورة رقم ${saleId}`, invoiceHtml);
             } catch (error) {
-                console.error('Failed to get sale details or generate invoice:', error); // سجل الخطأ للمطور
+                console.error('Failed to get sale details or generate invoice:', error);
                 Swal.fire('خطأ!', 'فشل عرض تفاصيل الفاتورة.', 'error');
             }
         }
     });
 
-    async function loadAllReports(filter) {
+    // Updated loadAllReports to accept invoiceId
+    async function loadAllReports(filter = 'today', invoiceId = null) {
         try {
-            const range = getDateRange(filter);
-            const [salesData, analyticsData] = await Promise.all([
-                window.api.getSales(range),
-                window.api.getAnalytics(range)
-            ]);
+            let salesData;
+            let analyticsData;
 
-            renderKpis(salesData, analyticsData.totalExpenses);
+            if (invoiceId) {
+                // If an invoice ID is provided, fetch only that specific sale
+                // Note: The backend getSales function needs to be updated to support fetching by ID
+                salesData = await window.api.getSalesById(parseInt(invoiceId));
+                // For analytics, if searching by single invoice, KPIs will be based on this invoice
+                // For simplicity, we'll run analytics for today if searching by invoice to avoid empty analytics
+                // Or you can create a specific analytics endpoint for single sale
+                const todayRange = getDateRange('today');
+                analyticsData = await window.api.getAnalytics(todayRange);
+            } else {
+                const range = getDateRange(filter);
+                [salesData, analyticsData] = await Promise.all([
+                    window.api.getSales(range),
+                    window.api.getAnalytics(range)
+                ]);
+            }
+            
+            renderKpis(salesData, analyticsData); // analyticsData now contains totalCostOfGoodsSold
             renderSalesTable(salesData);
-            if (analyticsData.success) {
+
+            // Analytics data (best sellers, peak hours, cashier performance)
+            // will always be based on the general time filter, not single invoice search
+            // unless you create specific backend logic for single invoice analytics.
+            // For now, if searching by ID, these might not make sense or will show for the 'today' range.
+            if (analyticsData.success && !invoiceId) { // Only render if not searching by invoice ID
                 renderBestSellers(analyticsData.bestSellers);
                 renderCashierPerformance(analyticsData.cashierPerformance);
                 renderPeakHoursChart(analyticsData.peakHours);
+            } else if (invoiceId) { // Clear these sections if searching by ID
+                bestSellersTableBody.innerHTML = '';
+                cashierPerformanceTableBody.innerHTML = '';
+                if (peakHoursChartInstance) peakHoursChartInstance.destroy();
+                peakHoursChartInstance = null;
             }
+
         } catch (error) {
             console.error("Failed to load reports:", error);
             Swal.fire('خطأ', 'فشل تحميل بيانات التقارير.', 'error');
         }
     }
-    
-    function renderKpis(sales, expenses) {
+
+    // Updated renderKpis function
+    function renderKpis(sales, analyticsData) {
         const completedSales = sales.filter(s => s.status === 'completed');
         const refundedSales = sales.filter(s => s.status === 'refunded');
-        const totalRevenue = completedSales.reduce((sum, s) => sum + s.total_amount, 0);
-        const totalRefunds = refundedSales.reduce((sum, s) => sum + s.total_amount, 0);
-        const netRevenue = totalRevenue + totalRefunds; // يجب أن تكون المرتجعات بقيمة سالبة لخصمها
 
-        totalRevenueEl.textContent = formatCurrency(netRevenue);
+        const totalRevenueGross = completedSales.reduce((sum, s) => sum + s.total_amount, 0);
+        const totalRefundsAmount = refundedSales.reduce((sum, s) => sum + s.total_amount, 0); // Assuming positive amount for refunds
+        
+        // Net Revenue (Gross Sales - Refunds)
+        const netSales = totalRevenueGross - totalRefundsAmount;
+
+        const totalExpenses = analyticsData.totalExpenses || 0; // From backend
+        const totalCostOfGoodsSold = analyticsData.totalCostOfGoodsSold || 0; // From backend
+
+        const grossProfit = netSales - totalCostOfGoodsSold; // صافي الربح (الإيرادات بعد المرتجعات - تكلفة المنتجات)
+        const netProfitAfterExpenses = grossProfit - totalExpenses; // صافي الربح بعد المصروفات
+
         totalInvoicesEl.textContent = completedSales.length;
-        totalExpensesEl.textContent = formatCurrency(expenses);
-        netProfitEl.textContent = formatCurrency(netRevenue - expenses);
+        totalRevenueEl.textContent = formatCurrency(totalRevenueGross); // إجمالي المبيعات (الخام قبل خصم المرتجعات)
+        costOfGoodsSoldEl.textContent = formatCurrency(totalCostOfGoodsSold);
+        grossProfitEl.textContent = formatCurrency(grossProfit);
+        totalExpensesEl.textContent = formatCurrency(totalExpenses);
+        netProfitAfterExpensesEl.textContent = formatCurrency(netProfitAfterExpenses);
     }
 
     function renderSalesTable(sales) {
@@ -120,8 +187,7 @@ export function init(appSettings) {
 
     function renderBestSellers(data) {
         bestSellersTableBody.innerHTML = data.map(item => `
-            <tr><td>${item.product_name}</td><td>${item.total_quantity_sold}</td></tr>
-        `).join('');
+            <tr><td>${item.product_name}</td><td>${item.total_quantity}</td></tr> `).join('');
     }
 
     function renderCashierPerformance(data) {
@@ -140,7 +206,7 @@ export function init(appSettings) {
         }
 
         if (peakHoursChartInstance) peakHoursChartInstance.destroy();
-        
+
         peakHoursChartInstance = new Chart(peakHoursChartCanvas, {
             type: 'bar',
             data: {
@@ -170,7 +236,7 @@ export function init(appSettings) {
 
         if (filter === 'week') {
             const dayOfWeek = start.getDay();
-            start.setDate(start.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); 
+            start.setDate(start.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));
         } else if (filter === 'month') {
             start.setDate(1);
         }
@@ -188,7 +254,6 @@ export function init(appSettings) {
     }
 
     function formatCurrency(amount) {
-        // استخدام appSettings.currency بدلاً من 'EGP' الثابت
         return new Intl.NumberFormat('ar-EG', { style: 'currency', currency: appSettings.currency || 'EGP' }).format(amount || 0);
     }
 

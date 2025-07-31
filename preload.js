@@ -49,12 +49,13 @@ contextBridge.exposeInMainWorld('api', {
     // Sales
     finalizeSale: (saleData) => ipcRenderer.invoke('sales:finalize', saleData),
     getSales: (dateRange) => ipcRenderer.invoke('sales:get', dateRange),
+    getSalesById: (saleId) => ipcRenderer.invoke('sales:getById', saleId),
     processRefund: (refundData) => ipcRenderer.invoke('sales:process-refund', refundData),
     getSaleDetails: (saleId) => ipcRenderer.invoke('sales:get-details', saleId),
     onSalesUpdate: (callback) => ipcRenderer.on('sales-updated', (event) => callback()),
 
     // Reports
-    getAnalytics: (dateRange) => ipcRenderer.invoke('reports:get-analytics'),
+    getAnalytics: (dateRange) => ipcRenderer.invoke('reports:get-analytics', dateRange), // <--- تم التعديل هنا
 
     // Customers
     getCustomers: () => ipcRenderer.invoke('customers:get'),
