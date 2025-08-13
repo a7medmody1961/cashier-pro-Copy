@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - كاشير برو</title>
+    <!-- تأكد من أن هذه المسارات صحيحة -->
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/theme.css">
+    <link rel="stylesheet" href="../scripts/lib/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Modern UI Enhancements - Added by Gemini */
+        :root {
+            --color-primary-dark: #6a11cb;
+            --color-primary-light: #2575fc;
+            --color-bg-dark: #1f1f38;
+            --color-surface-card: rgba(255, 255, 255, 0.1);
+            --color-text-light: #e0e7ff;
+            --color-border-card: rgba(255, 255, 255, 0.2);
+            --shadow-strong: 0 10px 40px rgba(0, 0, 0, 0.3);
+            --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--color-text-light);
+            position: relative;
+            overflow: hidden;
+            /* Simple, clear background color */
+            background-color: #f0f4f8; /* A light, modern background */
+        }
+        
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .login-box {
+            background-color: #ffffff; /* Use a solid white background for clarity */
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1); /* A more subtle but deep shadow */
+            text-align: center;
+        }
+
+        .login-box h1 {
+            color: #333; /* Darker text for better contrast */
+            font-size: 2.8em;
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-shadow: none;
+        }
+
+        #saved-users-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .user-card {
+            cursor: pointer;
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            width: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background-color: #f8f9fa; /* Lighter background for the card */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: scale(1.05) translateY(-5px); /* Less aggressive animation */
+        }
+
+        .user-card.selected {
+            border-color: #2575fc;
+            background-color: #e0f2fe;
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 0 20px rgba(37, 117, 252, 0.5); /* Blue glow */
+            animation: none; /* Removed the pulsing animation for a cleaner look */
+        }
+        
+        .user-card .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+        }
+        
+        .user-card.selected .user-avatar {
+            border-color: #2575fc;
+        }
+        
+        .user-card .user-name {
+            font-weight: 700;
+            color: #333; /* Darker text for better visibility */
+            font-size: 1.2em;
+            margin-top: 5px;
+            transition: color 0.4s ease;
+        }
+        
+        .user-card.selected .user-name {
+            color: #2575fc;
+        }
+
+        #login-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #login-form .form-group {
+            width: 100%;
+            max-width: 350px;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        #password {
+            width: 100%;
+            padding: 18px 25px;
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            font-size: 1.2em;
+            text-align: center;
+            background-color: #f9fafb;
+            color: #333; /* Dark text for better visibility */
+            transition: all 0.4s ease;
+            box-sizing: border-box;
+            /* Ensure the input is not read-only or disabled */
+            pointer-events: auto;
+            -webkit-user-modify: read-write-plaintext-only;
+        }
+
+        #password::placeholder {
+            color: #999;
+        }
+
+        #password:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 0 4px rgba(37, 117, 252, 0.3);
+            outline: none;
+            background-color: #fff;
+        }
+
+        #error-message {
+            color: #ff6b6b;
+            min-height: 20px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 18px 50px;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .loader-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #2575fc;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>أهلاً بك في كاشير برو</h1>
+            
+            <!-- هذا هو المكان الذي سيتم فيه عرض بطاقات المستخدمين -->
+            <div id="saved-users-container">
+                <!-- سيتم ملء المستخدمين هنا بواسطة JavaScript -->
+                <div class="loader-spinner"></div>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور هنا" required>
+                </div>
+                <div id="error-message"></div>
+                <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- تحميل السكريبتات -->
+    <script src="../scripts/lib/sweetalert2.all.min.js"></script>
+    <script src="../scripts/login.js"></script>
+</body>
+</html>

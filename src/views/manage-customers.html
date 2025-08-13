@@ -1,0 +1,340 @@
+<div class="management-container">
+    <h1>إدارة العملاء</h1>
+    
+    <div class="page-actions">
+        <button id="import-customers-btn" class="btn btn-secondary"><i class="fa-solid fa-file-import"></i> استيراد من Excel</button>
+        <button id="export-customers-btn" class="btn btn-secondary"><i class="fa-solid fa-file-excel"></i> تصدير إلى Excel</button>
+        <button id="download-customers-template-btn" class="btn btn-secondary"><i class="fa-solid fa-download"></i> تحميل قالب Excel</button>
+    </div>
+    
+    <div class="form-container">
+        <h2>إضافة عميل جديد</h2>
+        <form id="add-customer-form">
+            <div class="form-grid-columns">
+                <div class="form-group"><label for="new-customer-name">اسم العميل</label><input type="text" id="new-customer-name" required></div>
+                <div class="form-group"><label for="new-customer-phone">رقم الهاتف</label><input type="tel" id="new-customer-phone" required></div>
+                <div class="form-group"><label for="new-customer-address">العنوان الافتراضي</label><input type="text" id="new-customer-address" required></div>
+            </div>
+            <div class="form-actions"><button type="submit" class="btn btn-primary">إضافة العميل</button></div>
+        </form>
+    </div>
+
+    <!-- Container for Search and Sort options - Moved to be just above the table -->
+    <div class="table-actions">
+        <div class="search-container">
+            <input type="text" id="customer-search" placeholder="ابحث عن عميل بالاسم أو الهاتف..." class="search-input">
+            <i class="fa-solid fa-search search-icon"></i>
+        </div>
+        <div class="sort-container">
+            <label for="sort-by">ترتيب حسب:</label>
+            <select id="sort-by" class="sort-select">
+                <option value="name">الاسم (أبجدي)</option>
+                <option value="creation_date">تاريخ الإنشاء</option>
+                <option value="order_count">عدد الطلبات</option>
+                <option value="total_spent">إجمالي الإنفاق</option>
+                <option value="address_city">المحافظة</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <h2>قائمة العملاء</h2>
+        <table id="customers-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%; text-align: center;">الاسم</th>
+                    <th style="width: 15%; text-align: center;">الهاتف</th>
+                    <th style="width: 25%; text-align: center;">العنوان الافتراضي</th>
+                    <th style="width: 10%; text-align: center;">إجمالي الإنفاق</th>
+                    <th style="width: 5%; text-align: center;">عدد الطلبات</th>
+                    <th style="width: 5%; text-align: center;">النقاط المكتسبة الكلية</th>
+                    <th style="width: 5%; text-align: center;">النقاط المتبقية للاستخدام</th>
+                    <th style="width: 5%; text-align: center;">النقاط التي تم استخدامها سابقاً</th>
+                    <th style="width: 10%; text-align: center;">إجراءات</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- نافذة منبثقة لعرض سجل معاملات العميل -->
+<div id="customer-transactions-modal" class="modal">
+    <div class="modal-content large-modal">
+        <span class="close-btn" title="إغلاق">&times;</span>
+        <h2 id="transactions-customer-name">سجل معاملات العميل: </h2>
+        <div class="table-container">
+            <table id="customer-transactions-table" class="striped-table">
+                <thead>
+                    <tr>
+                        <th>رقم الفاتورة</th>
+                        <th>التاريخ</th>
+                        <th>النوع</th>
+                        <th>طريقة الدفع</th>
+                        <th>الخصم اليدوي</th>
+                        <th>الإجمالي</th>
+                        <th>نقاط الولاء المكتسبة</th>
+                        <th>المنتجات</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div id="address-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" title="إغلاق">&times;</span>
+        <h2 id="modal-customer-name">عناوين العميل</h2>
+        <input type="hidden" id="modal-customer-id">
+        <ul id="addresses-list"></ul>
+        <form id="add-address-form" style="margin-top: 20px;">
+            <div class="form-group">
+                <label for="new-address">إضافة عنوان جديد</label>
+                <div style="display: flex;">
+                    <input type="text" id="new-address" required style="flex-grow: 1; margin-left: 10px;">
+                    <button type="submit" class="btn btn-primary">إضافة</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+/* CSS for the avatar selection section */
+.avatar-selection-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.avatar-preview-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.avatar-preview {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.avatar-options-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.avatar-icon {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: var(--card-bg);
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.avatar-icon.selected,
+.avatar-icon:hover {
+    border-color: var(--primary-color);
+}
+
+.table-container th:first-child,
+.table-container td:first-child {
+    width: 70px;
+    text-align: center;
+}
+
+.table-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .avatar-selection-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* New styles for search and sort section */
+.table-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: var(--color-surface-solid);
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    font-size: 1em;
+    border-radius: 50px; /* Make it more modern and dynamic */
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    font-size: 1.1em;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sort-container label {
+    font-weight: bold;
+    color: var(--color-text-muted);
+}
+
+.sort-select {
+    padding: 12px;
+    font-size: 1em;
+    border-radius: 50px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    appearance: none; /* Hide default dropdown arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'); /* Add a custom arrow icon */
+    background-repeat: no-repeat;
+    background-position: left 15px center;
+    padding-left: 40px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .table-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .search-container {
+        max-width: 100%;
+    }
+}
+
+/* Updated table styles for better clarity and overflow handling */
+table {
+    width: 100%;
+    border-collapse: separate; /* Changed to 'separate' to allow borders on cells */
+    border-spacing: 0;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: center; /* Centered all table content */
+    border: 1px solid var(--color-border); /* Added a border to each cell */
+    vertical-align: middle;
+    word-wrap: break-word; /* Allows long words to wrap */
+    white-space: normal; /* Ensures text wraps normally within the cell */
+}
+
+/* Updated specific styling for thead */
+thead {
+    background-color: var(--color-bg);
+    border-bottom: 2px solid var(--color-primary-light);
+}
+
+thead th {
+    font-weight: bold;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border); /* All headers have borders */
+}
+
+tbody tr:hover {
+    background-color: var(--color-primary-light);
+}
+
+.actions-cell {
+    display: flex;
+    gap: 10px;
+    justify-content: center; /* Centered buttons in the actions cell */
+}
+
+#products-table img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: var(--border-radius-sm);
+}
+
+/* Custom styles for the new transaction modal */
+.modal.large-modal .modal-content {
+    max-width: 90%;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: var(--border-radius-lg); /* إضافة حواف دائرية */
+    box-shadow: var(--shadow-xl); /* إضافة ظل أكبر */
+    padding: 30px; /* زيادة المساحة الداخلية */
+}
+
+.modal-content .close-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    color: var(--color-text-muted);
+    font-size: 2em;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+.modal-content .close-btn:hover,
+.modal-content .close-btn:focus {
+    color: var(--color-primary);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    color: var(--color-primary-dark);
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+</style>

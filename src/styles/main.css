@@ -1,0 +1,491 @@
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../assets/fonts/Tajawal-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../assets/fonts/Tajawal-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, button, a, [data-page], .product-card, .btn, select, input[type=button], input[type=submit] {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231e293b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z'/%3E%3Cpath d='M13 13l6 6'/%3E%3C/svg%3E") 3 3, auto;
+}
+input[type=text], input[type=password], input[type=number], input[type=tel], textarea {
+    cursor: text;
+}
+body.dark-mode,
+body.dark-mode button,
+body.dark-mode a,
+body.dark-mode [data-page],
+body.dark-mode .product-card,
+body.dark-mode .btn,
+body.dark-mode select,
+body.dark-mode input[type=button],
+body.dark-mode input[type=submit] {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z'/%3E%3Cpath d='M13 13l6 6'/%3E%3C/svg%3E") 3 3, auto;
+}
+body.dark-mode input[type=text],
+body.dark-mode input[type=password],
+body.dark-mode input[type=number],
+body.dark-mode input[type=tel],
+body.dark-mode textarea {
+    cursor: text;
+}
+
+
+body {
+    margin: 0;
+    font-family: var(--font-main);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    overflow: hidden;
+    font-size: 16px;
+}
+
+.app-layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* --- Sidebar --- */
+.sidebar-container {
+    width: 260px;
+    flex-shrink: 0;
+    background-color: var(--color-surface-solid);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: var(--shadow-lg);
+    z-index: 10;
+}
+.sidebar-header .logo { font-size: 2em; text-align: center; color: var(--color-primary); margin: 0 0 10px; }
+#user-info { text-align: center; margin-bottom: 20px; color: var(--color-text-muted); }
+#user-info .user-role { font-size: 0.9em; }
+.main-navigation { display: flex; flex-direction: column; gap: 8px; }
+.nav-btn { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: var(--border-radius-md); font-size: 1.1em; text-align: right; background: none; border: none; color: var(--color-text-muted); width: 100%; transition: var(--transition-speed) ease; }
+.nav-btn .icon { font-size: 1.2em; width: 25px; text-align: center; }
+.nav-btn:hover { background-color: var(--color-primary-light); color: var(--color-primary); }
+.nav-btn.active { background-color: var(--color-primary); color: white; font-weight: bold; }
+.sidebar-shift-section { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--color-border); text-align: center; }
+#shift-status { font-weight: bold; margin-bottom: 10px; }
+#shift-btn { width: 100%; }
+.sidebar-footer { padding-top: 20px; border-top: 1px solid var(--color-border); }
+.theme-switcher-container { display: flex; justify-content: center; margin-bottom: 15px; }
+#theme-switcher { width: 50px; height: 50px; border-radius: 50%; font-size: 1.5em; display: flex; align-items: center; justify-content: center; padding: 0; }
+#logout-btn { background-color: var(--color-primary-light); color: var(--color-primary); }
+#logout-btn:hover { background-color: var(--color-danger); color: white; }
+.dev-info { font-size: 0.8em; text-align: center; color: var(--color-text-muted); margin-top: 15px; }
+.dev-info a { color: var(--color-primary); text-decoration: none; }
+
+.content-wrapper-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.page-header {
+    flex-shrink: 0;
+    padding: 10px 30px;
+    background: var(--color-surface);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: center; /* Horizontally center */
+    align-items: center;     /* Vertically center */
+}
+#live-datetime { text-align: center; }
+#live-time { font-size: 1.8em; font-weight: bold; }
+#live-time .ampm { font-size: 0.6em; font-weight: normal; margin-right: 5px; }
+#live-date { color: var(--color-text-muted); }
+.content-area { flex-grow: 1; overflow-y: auto; padding: 20px; }
+
+.btn { padding: 12px 24px; border: none; border-radius: var(--border-radius-md); font-size: 1em; font-weight: bold; transition: all 0.2s ease; }
+.btn-primary { background-color: var(--color-primary); color: white; }
+.btn-primary:hover { background-color: var(--color-primary-dark); }
+.btn-primary:disabled { background-color: var(--color-text-muted); cursor: not-allowed; }
+.btn-secondary { background-color: var(--color-surface-solid); color: var(--color-text); border: 1px solid var(--color-border); }
+.btn-secondary:hover { background-color: var(--color-bg); }
+.btn-danger { background-color: var(--color-danger); color: white; }
+.btn-danger:hover { opacity: 0.8; }
+.fa-solid, .fas { font-weight: 900; }
+.icon { margin-left: 8px; }
+
+#app-loader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--color-bg);
+}
+
+.loader-spinner {
+    border: 5px solid var(--color-primary-light);
+    border-top: 5px solid var(--color-primary);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+#app-loader p {
+    color: var(--color-text-muted);
+    font-size: 1.2em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader-sm {
+    border: 2px solid var(--color-primary-light);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0); /* Start transparent */
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensure it's on top of everything */
+    color: white; /* Changed to white for better contrast on dark overlay */
+    font-size: 1.2em;
+    gap: 15px;
+    opacity: 0; /* Start invisible */
+    transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out; /* Smooth transition */
+    pointer-events: none; /* Allow clicks through when invisible */
+}
+
+#loading-overlay.visible {
+    display: flex; /* Make it visible for transition */
+    pointer-events: auto; /* Block clicks when visible */
+}
+
+#loading-overlay.opaque {
+    opacity: 1; /* Fade in */
+    background-color: rgba(0, 0, 0, 0.7); /* Make it semi-transparent as before */
+}
+
+#loading-overlay .loader-spinner {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid var(--color-primary); /* Primary color for the spinner (corrected variable) */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+::-webkit-scrollbar {
+    width: 10px; /* Width for vertical scrollbar */
+    height: 10px; /* Height for horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-surface-solid); /* Background of the scrollbar track */
+    border-radius: var(--border-radius-md); /* Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-primary); /* Color of the scrollbar thumb */
+    border-radius: var(--border-radius-md); /* Rounded corners for the thumb */
+    border: 2px solid var(--color-surface-solid); /* Border around the thumb for better separation */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark); /* Darker color on hover */
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+    background: var(--color-surface); /* Darker track for dark mode */
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: var(--color-primary-light); /* Lighter thumb for dark mode */
+    border: 2px solid var(--color-surface);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary); /* Primary color on hover in dark mode */
+}
+
+
+/* =============================================== */
+/* == أنماط جديدة للميزات المتعلقة بالمستخدمين == */
+/* =============================================== */
+
+/* --- 1. أنماط الهيدر ومعلومات المستخدم --- */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-primary);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* For RTL layout */
+}
+
+.user-details .user-name {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--color-text);
+}
+
+.role-badge {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.role-badge.admin {
+    background-color: var(--color-danger);
+}
+
+.role-badge.cashier {
+    background-color: #f5a623; /* Fallback color for cashier */
+}
+
+/* --- 2. أنماط شاشة تسجيل الدخول --- */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--color-bg);
+}
+
+.login-box {
+    width: 90%;
+    max-width: 900px;
+    background-color: var(--color-surface);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.login-box h1 {
+    margin-bottom: 20px;
+    color: var(--color-primary);
+}
+
+#saved-users-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 30px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.user-card {
+    cursor: pointer;
+    padding: 15px;
+    border-radius: var(--border-radius-md);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    width: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-card:hover {
+    background-color: var(--color-primary-light);
+}
+
+.user-card.selected {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-light);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.user-card .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--color-surface-solid);
+}
+
+.user-card .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-card .user-name {
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+#login-form #password {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+    margin: 0 auto 15px;
+    display: block;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+#error-message {
+    color: var(--color-danger);
+    min-height: 20px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* --- 3. أنماط صفحة إدارة المستخدمين --- */
+.table-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-border);
+}
+
+.avatar-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: var(--color-bg);
+}
+
+.avatar-option {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.avatar-option:hover {
+    transform: scale(1.1);
+}
+
+.avatar-option.selected {
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+    box-shadow: 0 0 10px var(--color-primary-light);
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+}
+
+.status-active {
+    background-color: #28a745;
+}
+
+.status-inactive {
+    background-color: #6c757d;
+}
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1001; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--color-surface);
+    margin: 5% auto;
+    padding: 30px;
+    border: 1px solid var(--color-border);
+    width: 90%;
+    max-width: 600px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    left: 25px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: var(--color-danger);
+    text-decoration: none;
+    cursor: pointer;
+}

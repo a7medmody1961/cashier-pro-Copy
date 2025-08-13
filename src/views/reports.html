@@ -1,0 +1,76 @@
+<div class="management-container">
+    <h1>التقارير التحليلية</h1>
+    <div class="form-container">
+        <h2>نظرة عامة</h2>
+        <div class="filters">
+            <button class="btn filter-btn active" data-filter="today">اليوم</button>
+            <button class="btn filter-btn" data-filter="week">هذا الأسبوع</button>
+            <button class="btn filter-btn" data-filter="month">هذا الشهر</button>
+        </div>
+        <div class="kpi-container">
+            <div class="kpi-card"><h4 >عدد الفواتير</h4><span id="total-invoices">0</span></div>
+            <div class="kpi-card"><h4 >إجمالي المبيعات</h4><span id="total-revenue">0.00</span></div>
+            <div class="kpi-card cost-of-goods-sold"><h4 >تكلفة المنتجات المباعة</h4><span id="cost-of-goods-sold">0.00</span></div>
+            <div class="kpi-card gross-profit"><h4 >صافي الربح</h4><span id="gross-profit">0.00</span></div>
+            <div class="kpi-card total-expenses"><h4 >المصروفات</h4><span id="total-expenses">0.00</span></div>
+            <div class="kpi-card net-profit-after-expenses"><h4 >صافي الربح بعد المصروفات</h4><span id="net-profit-after-expenses">0.00</span></div>
+        </div>
+    </div>
+    <div class="analytics-grid">
+        <div class="table-container">
+            <h2>المنتجات الأكثر مبيعاً</h2>
+            <table id="best-sellers-table"><thead><tr><th>المنتج</th><th>الكمية المباعة</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="chart-container"><h2>تحليل ساعات الذروة</h2><canvas id="peak-hours-chart"></canvas></div>
+        <div class="table-container">
+            <h2>أداء الكاشير</h2>
+            <table id="cashier-performance-table"><thead><tr><th>الكاشير</th><th>عدد الفواتير</th><th>إجمالي المبيعات</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+    <div class="table-container" style="margin-top: 20px;">
+        <h2>قائمة المبيعات التفصيلية</h2>
+        <div class="search-bar" style="margin-bottom: 10px; display: flex; gap: 10px;">
+            <input type="text" id="invoice-search-input" placeholder="البحث برقم الفاتورة..." class="form-control" style="flex-grow: 1;">
+            <button class="btn btn-primary" id="search-invoice-btn">بحث</button>
+            <button class="btn btn-secondary" id="clear-invoice-search-btn">مسح</button>
+        </div>
+        <table id="sales-table"><thead><tr><th>#</th><th>الكاشير</th><th>العميل</th><th>الحالة</th><th>الإجمالي</th><th>الدفع</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+    </div>
+</div>
+
+<!-- Modal for Partial Refund -->
+<div id="partial-refund-modal" class="modal" style="display: none;">
+    <div class="modal-content" style="width: 50%; max-width: 600px; margin: 5% auto;">
+        <div class="modal-header">
+            <h2>إرجاع جزئي للفاتورة <span id="refund-modal-invoice-id"></span></h2>
+            <span class="close-button" id="close-refund-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="refund-summary-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <span>إجمالي الفاتورة:</span><span id="refund-modal-total-amount" class="text-info">0.00</span>
+                <span>المبلغ المرتجع:</span><span id="refund-modal-refund-amount" class="text-danger">0.00</span>
+            </div>
+            <hr>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>المنتج</th>
+                        <th>الكمية المباعة</th>
+                        <th>سعر الوحدة</th>
+                        <th>الكمية للإرجاع</th>
+                    </tr>
+                </thead>
+                <tbody id="refund-items-table-body">
+                    <!-- Invoice items will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-secondary" id="cancel-partial-refund-btn">إلغاء</button>
+            <div>
+                <button class="btn btn-danger" id="confirm-full-refund-btn">إرجاع كامل</button>
+                <button class="btn btn-primary" id="confirm-partial-refund-btn">تأكيد الإرجاع</button>
+            </div>
+        </div>
+    </div>
+</div>

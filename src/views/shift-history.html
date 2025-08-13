@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل الورديات - كاشير برو</title>
+    <link rel="stylesheet" href="../scripts/lib/all.min.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/management.css">
+    <link rel="stylesheet" href="../styles/theme.css">
+</head>
+<body>
+    <div class="main-content">
+        <div class="header">
+            <h1 class="title"><i class="fas fa-history"></i> سجل الورديات</h1>
+            <div class="header-actions">
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>المستخدم</th>
+                            <th>وقت البدء</th>
+                            <th>وقت الانتهاء</th>
+                            <th>نقدية البداية</th>
+                            <th>نقدية النهاية</th>
+                            <th>إجمالي المبيعات</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shifts-table-body">
+                        <tr>
+                            <td colspan="9" class="text-center">جارٍ تحميل الورديات...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="shiftDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>تفاصيل الوردية <span id="modalShiftId"></span></h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="shift-summary-details">
+                    <p><strong>المستخدم:</strong> <span id="detailUsername"></span></p>
+                    <p><strong>وقت البدء:</strong> <span id="detailStartTime"></span></p>
+                    <p><strong>وقت الانتهاء:</strong> <span id="detailEndTime"></span></p>
+                    <p><strong>نقدية البداية:</strong> <span id="detailStartingCash"></span></p>
+                    <p><strong>نقدية النهاية:</strong> <span id="detailEndingCash"></span></p>
+                    <p><strong>إجمالي المبيعات:</strong> <span id="detailTotalSales"></span></p>
+                </div>
+
+                <h3>المبيعات خلال الوردية:</h3>
+                <div class="data-table-container compact">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>معرف البيع</th>
+                                <th>العميل</th>
+                                <th>المبلغ الكلي</th>
+                                <th>طريقة الدفع</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shift-sales-table-body">
+                            <tr>
+                                <td colspan="5" class="text-center">لا توجد مبيعات لهذه الوردية.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>المصروفات خلال الوردية:</h3>
+                <div class="data-table-container compact">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الوصف</th>
+                                <th>المبلغ</th>
+                                <th>الفئة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shift-expenses-table-body">
+                            <tr>
+                                <td colspan="4" class="text-center">لا توجد مصروفات لهذه الوردية.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-button">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/core/page-loader.js"></script>
+    <script src="../scripts/core/app-state.js"></script>
+    <script src="../scripts/ui/modal-helpers.js"></script>
+    <script src="../scripts/shift-history.js"></script>
+</body>
+</html>

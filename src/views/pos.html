@@ -1,0 +1,197 @@
+<div class="pos-layout">
+    <!-- ============================================================================== -->
+    <!-- قسم المنتجات والفئات (لا تغييرات هنا) -->
+    <!-- ============================================================================== -->
+    <div class="products-section-container">
+        <div class="content-header">
+            <div class="search-and-quantity-controls">
+                <input type="text" id="search-bar" placeholder="بحث عن منتج بالاسم أو الباركود...">
+            </div>
+            <div id="category-filter-bar" class="category-filter-bar">
+            </div>
+        </div>
+        <div id="product-grid" class="product-grid">
+        </div>
+    </div>
+
+    <!-- ============================================================================== -->
+    <!-- قسم الفاتورة (تم إعادة هيكلته) -->
+    <!-- ============================================================================== -->
+    <aside class="invoice-section-container">
+        <!-- [تعديل 1]: تم إنشاء حاوية جديدة للمحتوى الرئيسي للفاتورة -->
+        <!-- هذا سيسمح بتثبيت الشريط السفلي (الفوتر) بشكل صحيح -->
+        <div class="invoice-main-content">
+            <div class="invoice-header">
+                <div id="order-type-selector" class="order-type-selector">
+                    <button class="btn active" data-type="dine-in">صالة</button>
+                    <button class="btn" data-type="delivery">توصيل</button>
+                </div>
+                <div id="customer-section" style="position: relative;">
+                    <!-- قسم عميل الصالة (لا تغييرات) -->
+                    <div id="dine-in-customer-form" class="customer-details-form" style="display: block;">
+                        <div class="form-group">
+                            <label for="dine-in-customer-name">اسم العميل (اختياري)</label>
+                            <input type="text" id="dine-in-customer-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="dine-in-customer-phone">رقم هاتف العميل (اختياري)</label>
+                            <input type="tel" id="dine-in-customer-phone">
+                        </div>
+                    </div>
+                    <!-- قسم عميل التوصيل (تم تعديل حقل العنوان) -->
+                    <div id="delivery-customer-form" class="customer-details-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="customer-phone">رقم هاتف العميل</label>
+                            <input type="tel" id="customer-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-name">اسم العميل</label>
+                            <input type="text" id="customer-name" required>
+                        </div>
+                        
+                        <!-- [تعديل 2]: تم تحديث قسم اختيار العنوان بالكامل -->
+                        <div id="address-management-section" class="form-group">
+                            <label>العنوان</label>
+                            <div class="address-selector-wrapper">
+                                <select id="customer-address-select" class="form-input">
+                                    <!-- سيتم ملء العناوين المحفوظة هنا عبر جافاسكريبت -->
+                                </select>
+                                <button id="add-new-address-btn" class="btn btn-icon" title="إضافة عنوان جديد">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="new-address-container" style="display: none; margin-top: 10px;">
+                                <input type="text" id="new-customer-address" class="form-input" placeholder="أدخل العنوان الجديد هنا">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="customer-search-results"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="salesperson-select">البائع المسؤول (اختياري)</label>
+                    <div class="custom-select-wrapper">
+                        <select id="salesperson-select">
+                            <option value="">-- لا يوجد بائع --</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div id="invoice-items" class="invoice-items-list">
+                <p class="empty-invoice">الفاتورة فارغة</p>
+            </div>
+        </div>
+
+        <!-- [تعديل 1]: الفوتر الآن عنصر مستقل لتسهيل تثبيته بالأسفل -->
+        <footer class="invoice-footer">
+            <div class="invoice-summary-grid">
+                <span>المجموع الفرعي</span><span id="sub-total">0.00</span>
+                <span>الضريبة</span><span id="vat-total">0.00</span>
+                <span>خدمة</span><span id="service-total">0.00</span>
+                <span id="delivery-label" style="display: none;">توصيل</span><span id="delivery-total" style="display: none;">0.00</span>
+                
+                <div class="invoice-discount-row">
+                    <!-- زر خصم الفاتورة موجود بالفعل، سيتم التحكم بإظهاره عبر JS -->
+                    <button class="btn btn-primary" id="open-invoice-discount-modal-btn">
+                        <i class="fa-solid fa-tags"></i> خصم الفاتورة
+                    </button>
+                </div>
+                <div id="manual-discount-row" style="display: none; grid-column: 1 / -1;">
+                    <span>الخصم اليدوي</span>
+                    <span id="manual-discount-value">0.00</span>
+                </div>
+            </div>
+
+            <!-- [تعديل 3]: تم إضافة قسم لعرض النقاط المكتسبة من الطلب الحالي -->
+            <div id="earned-points-section" class="loyalty-section" style="display: none;">
+                <div class="loyalty-info">
+                    <i class="fa-solid fa-star"></i>
+                    <span>النقاط المكتسبة:</span>
+                    <span id="earned-points-value" class="loyalty-points-display">0 نقطة (تساوي 0.00)</span>
+                </div>
+            </div>
+
+            <div id="loyalty-points-section" class="loyalty-section" style="display: none;">
+                 <div class="loyalty-info">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>نقاط الولاء المتاحة:</span>
+                    <span id="customer-loyalty-points" class="loyalty-points-display">0 نقطة</span>
+                </div>
+                <div class="loyalty-actions">
+                    <label for="apply-loyalty-discount">تطبيق الخصم</label>
+                    <input type="checkbox" id="apply-loyalty-discount" class="loyalty-checkbox">
+                </div>
+                 <div id="loyalty-discount-display" style="display: none;">
+                    <span>قيمة الخصم:</span>
+                    <span id="loyalty-discount-value" class="loyalty-points-display">0.00</span>
+                </div>
+            </div>
+
+            <div class="invoice-summary">
+                <span>الإجمالي</span>
+                <span class="total-price" id="grand-total">0.00</span>
+            </div>
+            <div class="action-buttons">
+                <button id="cancel-order-btn" class="btn btn-danger">إلغاء</button>
+                <button id="finalize-button" class="btn btn-primary" disabled>إتمام الدفع</button>
+            </div>
+        </footer>
+    </aside>
+</div>
+
+<!-- ============================================================================== -->
+<!-- النوافذ المنبثقة (Modals) -->
+<!-- ============================================================================== -->
+
+<!-- نافذة الملاحظات (لا تغييرات) -->
+<div id="note-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>إضافة ملاحظة</h2>
+        <textarea id="note-input" placeholder="اكتب ملاحظتك هنا..."></textarea>
+        <button id="save-note-btn" class="btn btn-primary">حفظ الملاحظة</button>
+    </div>
+</div>
+
+<!-- نافذة خصم الفاتورة (لا تغييرات) -->
+<div id="manual-invoice-discount-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" id="close-manual-discount-modal">&times;</span>
+        <h2>خصم على الفاتورة بالكامل</h2>
+        <div class="form-group">
+            <label for="manual-discount-type">نوع الخصم</label>
+            <select id="manual-discount-type" class="form-input">
+                <option value="fixed">قيمة ثابتة</option>
+                <option value="percentage">نسبة مئوية</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="manual-discount-input">قيمة الخصم</label>
+            <input type="number" id="manual-discount-input" class="form-input" placeholder="0" min="0">
+        </div>
+        <button id="apply-manual-discount-btn" class="btn btn-primary">تطبيق الخصم</button>
+    </div>
+</div>
+
+<!-- [تعديل 4]: تم إضافة نافذة منبثقة جديدة للخصم على منتج معين -->
+<!-- هذه النافذة كانت ناقصة وتسبب مشكلة في الواجهة -->
+<div id="item-discount-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" id="close-item-discount-modal">&times;</span>
+        <h2>خصم على المنتج</h2>
+        <input type="hidden" id="discount-item-id">
+        <div class="form-group">
+            <label for="item-discount-type">نوع الخصم</label>
+            <select id="item-discount-type" class="form-input">
+                <option value="fixed">قيمة ثابتة</option>
+                <option value="percentage">نسبة مئوية</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="item-discount-input">قيمة الخصم</label>
+            <input type="number" id="item-discount-input" class="form-input" placeholder="0" min="0">
+        </div>
+        <button id="apply-item-discount-btn" class="btn btn-primary">تطبيق الخصم</button>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' file: data: https://placehold.co; worker-src blob:;">
+    <title>كاشير برو</title>
+    
+    <link rel="preload" href="../assets/fonts/Tajawal-Bold.ttf" as="font" type="font/ttf">
+    <link rel="preload" href="../assets/fonts/Tajawal-Regular.ttf" as="font" type="font/ttf">
+
+    <link rel="stylesheet" href="../scripts/lib/all.min.css"/>     
+    <link rel="stylesheet" href="../styles/theme.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/management.css">
+    <link rel="stylesheet" href="../styles/pos.css">
+</head>
+<body>
+    <div id="app-loader">
+        <div class="loader-spinner"></div>
+        <p>جاري تحميل البيانات...</p>
+    </div>
+
+    <div id="loading-overlay" style="display: none;">
+        <div class="loader-spinner"></div>
+        <p>جاري المعالجة...</p>
+    </div>
+
+    <div class="app-layout" style="display: none;">
+        <aside class="sidebar-container">
+            <div class="sidebar-header">
+                <h1 class="logo">كاشير برو</h1>
+                <div id="user-info"></div>
+            </div>
+            <nav id="main-nav" class="main-navigation">
+                <a class="nav-btn" data-view="pos"><i class="fa-solid fa-cash-register icon"></i> <span>نقطة البيع</span></a>
+                <a class="nav-btn" data-view="manage-products"><i class="fa-solid fa-boxes-stacked icon"></i> <span>المنتجات</span></a>
+                <a class="nav-btn" data-view="manage-customers"><i class="fa-solid fa-users icon"></i> <span>العملاء</span></a>
+                <a class="nav-btn" data-view="manage-salespersons"><i class="fa-solid fa-user-tie icon"></i> <span>البائعين</span></a>
+                <a class="nav-btn" data-view="manage-expenses"><i class="fa-solid fa-money-bill-transfer icon"></i> <span>المصروفات</span></a>
+                <a class="nav-btn" data-view="reports"><i class="fa-solid fa-chart-line icon"></i> <span>المبيعات والفواتير</span></a>
+                <a class="nav-btn" data-view="manage-users"><i class="fa-solid fa-user-gear icon"></i> <span>المستخدمين</span></a>
+                <a class="nav-btn" data-view="shift-history">
+                    <i class="fas fa-history icon"></i> <span>سجل الورديات</span>
+                </a>
+                <a class="nav-btn" data-view="settings"><i class="fa-solid fa-gear icon"></i> <span>الإعدادات</span></a>
+            </nav>
+            <div class="sidebar-shift-section">
+                <p id="shift-status">لا توجد وردية مفتوحة</p>
+                <button id="shift-btn" class="btn btn-secondary">بدء الوردية</button>
+            </div>
+            <div class="sidebar-footer">
+                <div class="theme-switcher-container">
+                    <button id="sound-toggle-btn" class="btn">
+                        <i class="fa-solid fa-volume-high"></i> 
+                    </button>
+                    <button id="theme-switcher" class="btn"><i class="fa-solid fa-moon"></i></button>
+                </div>
+                <button id="logout-btn" class="nav-btn"><i class="fa-solid fa-right-from-bracket icon"></i> <span>تسجيل الخروج</span></button>
+                <div class="dev-info">
+                    <p>Developed by Ahmed Badawy</p>
+                    <div class="dev-links">
+                        <a href="#" id="whatsapp-link">WhatsApp</a> | 
+                        <a href="#" id="messenger-link">Messenger</a> | 
+                        <a href="#" id="telegram-link">Telegram</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <div class="content-wrapper-container">
+            <header class="page-header">
+                <div id="live-datetime">
+                    <div id="live-time">12:00:00 <span class="ampm"></span></div>
+                    <div id="live-date"></div>
+                </div>
+            </header>
+            <main id="main-content" class="content-area"></main>
+        </div>
+    </div>
+
+    <script src="../scripts/lib/sweetalert2.all.min.js"></script>
+    <script src="../scripts/lib/chart.js"></script>
+    <script src="../scripts/lib/Tone.js"></script>
+    <script src="../scripts/renderer.js" type="module"></script>
+</body>
+</html>

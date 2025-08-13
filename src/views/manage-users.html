@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين</title>
+    <!-- التأكد من أن مسارات ملفات الأنماط صحيحة -->
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/management.css">
+    <link rel="stylesheet" href="../styles/avatars.css"> <!-- ملف أنماط جديد للصور الرمزية -->
+    <link rel="stylesheet" href="../scripts/lib/all.min.css"> <!-- Font Awesome -->
+</head>
+<body>
+    <div class="management-container">
+        <!-- قسم النموذج (إضافة وتعديل المستخدم) -->
+        <div class="form-container card">
+            <h2 id="form-title">إضافة مستخدم جديد</h2>
+            <form id="user-form">
+                <!-- حقول مخفية لتخزين البيانات -->
+                <input type="hidden" id="user-id">
+                <input type="hidden" id="user-avatar">
+
+                <!-- قسم الصورة الرمزية (Avatar) -->
+                <div class="avatar-section">
+                    <div id="avatar-preview" class="avatar-preview">
+                        <!-- سيتم عرض الصورة الرمزية المحددة هنا -->
+                    </div>
+                    <div id="avatar-options-wrapper" class="avatar-options-wrapper">
+                        <!-- سيتم وضع خيارات الصور الرمزية هنا بواسطة JS -->
+                    </div>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                    <button type="button" id="upload-avatar-btn" class="btn btn-secondary btn-block">
+                        <i class="fas fa-upload"></i> رفع صورة مخصصة
+                    </button>
+                </div>
+
+                <!-- حقول النموذج -->
+                <div class="form-group">
+                    <label for="username">اسم المستخدم:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">كلمة المرور (اتركه فارغاً لعدم التغيير):</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <div class="form-group">
+                    <label for="role">الدور:</label>
+                    <select id="role" name="role" required>
+                        <option value="Cashier">كاشير</option>
+                        <option value="Admin">مدير</option>
+                    </select>
+                </div>
+
+                <!-- قسم الصلاحيات -->
+                <div class="permissions-container">
+                    <h3>صلاحيات الوصول للصفحات</h3>
+                    <div id="permissions-grid" class="permissions-grid">
+                        <!-- سيتم ملء الصلاحيات هنا بواسطة JS إذا لزم الأمر، أو يمكن تركها ثابتة -->
+                        <div class="permission-item"><input type="checkbox" id="perm-pos" data-page="pos" checked disabled><label for="perm-pos">نقطة البيع</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-manage-products" data-page="manage-products"><label for="perm-manage-products">إدارة المنتجات</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-manage-customers" data-page="manage-customers"><label for="perm-manage-customers">إدارة العملاء</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-manage-expenses" data-page="manage-expenses"><label for="perm-manage-expenses">إدارة المصروفات</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-reports" data-page="reports"><label for="perm-reports">المبيعات والفواتير</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-manage-users" data-page="manage-users"><label for="perm-manage-users">إدارة المستخدمين</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-manage-salespersons" data-page="manage-salespersons"><label for="perm-manage-salespersons">إدارة البائعين</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-settings" data-page="settings"><label for="perm-settings">الإعدادات</label></div>
+                        <div class="permission-item"><input type="checkbox" id="perm-shift-history" data-page="shift-history"><label for="perm-shift-history">سجل الورديات</label></div>
+                    </div>
+                </div>
+
+                <!-- أزرار التحكم بالنموذج -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                    <button type="button" id="clear-form-btn" class="btn btn-secondary"><i class="fas fa-times"></i> إلغاء</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- قسم قائمة المستخدمين -->
+        <div class="list-container card">
+            <h2>قائمة المستخدمين</h2>
+            <div class="table-container">
+                <table id="users-table">
+                    <thead>
+                        <tr>
+                            <th>الصورة الرمزية</th>
+                            <th>اسم المستخدم</th>
+                            <th>الدور</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- سيتم ملء الصفوف هنا بواسطة JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

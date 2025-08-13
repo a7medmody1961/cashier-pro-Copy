@@ -1,0 +1,135 @@
+<div class="management-container">
+    <h1>إدارة المنتجات</h1>
+    <div class="page-actions">
+        <button id="import-products-btn" class="btn btn-secondary"><i class="fa-solid fa-file-import"></i> استيراد من Excel</button>
+        <button id="export-products-btn" class="btn btn-secondary"><i class="fa-solid fa-file-excel"></i> تصدير إلى Excel</button>
+        <button id="download-products-template-btn" class="btn btn-secondary"><i class="fa-solid fa-download"></i> تحميل قالب Excel</button>
+    </div>
+    <div class="form-container">
+        <h2 id="product-form-title">إضافة / تعديل منتج</h2>
+        <form id="product-form">
+            <input type="hidden" id="product-id">
+            <div class="form-grid-columns">
+                <div class="form-group"><label for="name">اسم المنتج</label><input type="text" id="name" required></div>
+                <div class="form-group"><label for="price">سعر البيع</label><input type="number" id="price" step="0.01" required></div>
+                <div class="form-group"><label for="cost_price">سعر التكلفة (اختياري)</label><input type="number" id="cost_price" step="0.01"></div>
+                <div class="form-group"><label for="stock">المخزون (فارغ لغير محدود)</label><input type="number" id="stock"></div>
+                <div class="form-group"><label for="barcode">الباركود (اختياري)</label><input type="text" id="barcode"></div>
+                <div class="form-group">
+                    <label for="category-id">الفئة</label>
+                    <select id="category-id">
+                        <!-- Categories will be populated here by JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group"><label for="shortcut_key">مفتاح الاختصار (حرف واحد)</label><input type="text" id="shortcut_key" maxlength="1"></div>
+            </div>
+            <div class="form-group">
+                <label>نوع عرض المنتج</label>
+                <div class="radio-group">
+                    <input type="radio" id="display-image" name="display-type" value="image" checked>
+                    <label for="display-image">صورة</label>
+                    <input type="radio" id="display-icon" name="display-type" value="icon">
+                    <label for="display-icon">أيقونة</label>
+                </div>
+            </div>
+
+            <div id="image-upload-section" class="form-group">
+                <label for="image-upload-btn">صورة المنتج</label>
+                <button type="button" id="image-upload-btn" class="btn btn-secondary">اختر صورة</button>
+                <img id="image-preview" src="" alt="Product Preview" style="max-width: 100px; max-height: 100px; margin-top: 10px; display: none;">
+            </div>
+
+            <div id="icon-selection-section" class="form-group" style="display: none; position: relative;">
+                <label for="product-icon">اسم الأيقونة (مثال: برجر، شاي، قهوة)</label>
+                <input type="text" id="product-icon" class="form-input" placeholder="اكتب اسم الأيقونة للبحث">
+                <div id="icon-suggestions" class="icon-suggestions-dropdown"></div>
+                <div id="icon-preview" style="font-size: 48px; margin-top: 10px; text-align: center;">
+                    <i class="fa-solid fa-question-circle"></i>
+                </div>
+                <p class="help-text">يمكنك البحث بأسماء شائعة أو اسم أيقونة Font Awesome الكامل (مثال: `fa-solid fa-burger`).</p>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">حفظ المنتج</button>
+                <button type="button" id="clear-form-btn" class="btn btn-secondary">مسح الحقول</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- New Section for Category Management -->
+    <div class="form-container">
+        <h2>إدارة الفئات</h2>
+        <form id="category-form">
+            <input type="hidden" id="category-id-to-edit">
+            <div class="form-grid-columns-2">
+                <div class="form-group">
+                    <label for="category-name">اسم الفئة</label>
+                    <input type="text" id="category-name" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">حفظ الفئة</button>
+                    <button type="button" id="clear-category-form-btn" class="btn btn-secondary">مسح</button>
+                </div>
+            </div>
+        </form>
+        <div class="table-container">
+            <h3>قائمة الفئات الحالية</h3>
+            <table id="categories-table" class="management-table">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Categories will be populated here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- End of New Section -->
+    
+    <div class="table-container">
+        <!-- New Controls Section -->
+        <div class="table-controls">
+            <!-- Search Bar -->
+            <div class="search-box">
+                <input type="text" id="product-search-input" placeholder="ابحث بالاسم أو الباركود..." class="search-input">
+            </div>
+            <!-- Sort Buttons -->
+            <div class="sort-buttons">
+                <span class="sort-label">فرز حسب:</span>
+                <button class="sort-btn active" data-sort-by="name">الاسم</button>
+                <button class="sort-btn" data-sort-by="price-asc">السعر <i class="fa-solid fa-arrow-up-wide-short"></i></button>
+                <button class="sort-btn" data-sort-by="price-desc">السعر <i class="fa-solid fa-arrow-down-wide-short"></i></button>
+                <button class="sort-btn" data-sort-by="cost_price">سعر التكلفة</button>
+                <button class="sort-btn" data-sort-by="stock">المخزون</button>
+            </div>
+            <!-- Delete All Button -->
+            <button id="delete-all-products-btn" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i> حذف كل المنتجات</button>
+        </div>
+
+        <h2>قائمة المنتجات الحالية</h2>
+        <table id="products-table" class="management-table">
+            <thead>
+                <tr>
+                    <th>صورة</th>
+                    <th>الاسم</th>
+                    <th>السعر</th>
+                    <th>سعر التكلفة</th> <!-- New column for Cost Price -->
+                    <th>الفئة</th>
+                    <th>الاختصار</th>
+                    <th>المخزون</th>
+                    <th>الباركود</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <!-- Pagination Controls -->
+        <div id="products-pagination" class="pagination-controls">
+            <button id="prev-page-btn" class="btn btn-secondary" disabled>السابق</button>
+            <span id="page-info">صفحة 1 من 1</span>
+            <button id="next-page-btn" class="btn btn-secondary" disabled>التالي</button>
+        </div>
+    </div>
+</div>

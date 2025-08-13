@@ -1,0 +1,67 @@
+/* --- Styling for Avatars --- */
+
+/* Container for the main avatar preview in the form */
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #f0f2f5; /* Light grey background */
+    margin: 0 auto 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* This is key to keeping the image inside the circle */
+    border: 3px solid #dee2e6;
+}
+
+/* The actual image inside the preview circle */
+.avatar-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Scales the image to cover the area without distortion */
+}
+
+/* Grid container for the selectable avatar options */
+.avatar-options-wrapper {
+    display: grid;
+    /* Creates a responsive grid of avatars */
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* An individual avatar option in the grid */
+.avatar-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent; /* Transparent border initially */
+    overflow: hidden;
+    padding: 2px; /* Small space between image and selection border */
+}
+
+/* The actual image inside an avatar option */
+.avatar-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%; /* Ensures the image itself is circular */
+}
+
+/* Style for the currently selected avatar in the grid */
+.avatar-icon.selected {
+    border-color: var(--primary-color); /* Uses the main color from your theme */
+    transform: scale(1.1); /* Slightly enlarges the selected icon */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+/* Style for the small avatars shown in the user list table */
+.table-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle; /* Aligns the avatar nicely with the text in the row */
+}
